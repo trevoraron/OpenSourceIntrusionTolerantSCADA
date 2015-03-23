@@ -1,4 +1,4 @@
-Open Source Intrusion Tolerant SCADA Research
+Open Source Intrusion Tolerant SCADA
 
 Contributors:
 
@@ -10,7 +10,17 @@ Contributors:
 
 About:
 
-We are working on building an Open Source Intrusion Tolerant SCADA system
-using the Prime BFT algorithm(JHU DSN) and the PVBrowser HMI. This is a 
-proof of concept, used as a resarch project for the course, Advanced Distributed
-System, under Professor Yair Amir.
+The purpose of this project is to develop a proof of concept system for 
+survivable SCADA via intrusion-tolerant replication.  Our implementation will
+use the Prime Replication System (http://www.dsn.jhu.edu/byzrep/prime.html) to 
+provide performance and safety guarantees over space and time for the SCADA 
+master.  It will also use a modified version of PVBrowser 
+(http://pvbrowser.de/pvbrowser/index.php) for the Human-Machine Interface (HMI).
+
+There is a paper outlining this concept, available from JHU DSN:
+http://www.cnds.jhu.edu/pub/papers/Survivable_SCADA.pdf
+
+This project project is being completed as part of the Advanced Distributed 
+Systems course at the Johns Hopkins University, under the supervision of 
+Prof. Yair Amir and the Johns Hopkins Distribued Systems & Networks Lab.
+
