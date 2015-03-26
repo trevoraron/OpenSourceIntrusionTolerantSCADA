@@ -1,0 +1,16 @@
+Open Source Intrusion Tolerant SCADA Research
+
+Contributors:
+
+    -Trevor Aron
+    -Akshay Srivatsan
+    -JR Charles
+
+    -JHU DSN lab
+
+About:
+
+We are working on building an Open Source Intrusion Tolerant SCADA system
+using the Prime BFT algorithm(JHU DSN) and the PVBrowser HMI. This is a 
+proof of concept, used as a resarch project for the course, Advanced Distributed
+System, under Professor Yair Amir.
