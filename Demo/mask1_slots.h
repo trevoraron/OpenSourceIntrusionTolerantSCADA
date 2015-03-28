@@ -11,41 +11,97 @@
 //extern rlModbusClient     modbus;
 //extern rlSiemensTCPClient siemensTCP;
 //extern rlPPIClient        ppi;
+
 #include <vector>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#define NUM_STREAMS 6
 using namespace std;
+//These are the modbus messages
+static const char *mbus_mess[] = {
+  "inputStatus(1,0)",
+  "inputStatus(1,8)",
+  "coilStatus(1,0)",
+  "holdingRegisters(1,0)",
+  "holdingRegisters(1,1)",
+  "inputRegisters(1,0)",
+  "inputRegisters(1,10)",
+};
+extern rlDataAcquisition *acqui;
 
 typedef struct // (todo: define your data structure here)
 {
-  vector<double> data;
+  vector<vector<double> > * data_lists;
   int amp;
-  //used for this demo
-  int time;
 }
 DATA;
 
+
 static int slotInit(PARAM *p, DATA *d)
 {
+
+  cout << "SLOT INIT \n";
   if(p == NULL || d == NULL) return -1;
   d->amp = 1;
-  for(int i = 0; i < 200; i++){
-    d->data.push_back(sin(i/200.0) * amp);
+  d->data_lists = new vector<vector<double> >(NUM_STREAMS, vector<double>());
+
+  //Graph stuff
+  cout<< "SETTING UP GRAPHS \n";
+  //Outline
+  qpwEnableOutline(p, Plot, 1);
+  qpwSetOutlinePen(p, Plot, GREEN);
+
+  //legend
+  qpwSetAutoLegend(p, Plot, 1);
+  qpwEnableLegend(p, Plot, 1);
+  qpwSetLegendPos(p, Plot, 1);
+  qpwSetLegendFrameStyle(p, Plot, Box|Sunken);
+
+  //axes
+  qpwSetAxisTitle(p, Plot, xBottom, "Time");
+  qpwSetAxisTitle(p, Plot, yLeft, "Value");
+ 
+  //Curves
+  cout<< "SETTING UP CURVES \n";
+  for(int i =0; i < NUM_STREAMS; i++) {
+    qpwInsertCurve(p, Plot, i, mbus_mess[i]);
+    //Maybe change, I was just winging the numbers, no idea how this will look
+    qpwSetCurvePen(p, Plot, i, 25*i, 100, 30 * i);
+    qpwSetCurveYAxis(p, Plot, i, yLeft);
   }
-  d->time = 199;
+
+
   return 0;
 }
 
 static int slotNullEvent(PARAM *p, DATA *d)
 {
+  cout << "SLOT NULL EVENT \n";
   if(p == NULL || d == NULL) return -1;
-  //TODO:replace with polling from modbus
-  double temp = sin((++d->time) / 200.0) * d->amp;
-  d->data.push_back(temp);
-  d->data.erase(d->data.begin());
+  //Will get an update from each new data stream
+  cout << "GETTING MODBUS DATA \n";
+  for(int i = 0; i < NUM_STREAMS; i++){
+    (* d->data_lists)[i].push_back(acqui->intValue(mbus_mess[i]));
+    if((* d->data_lists)[i].size() > 400) {
+      (* d->data_lists)[i].erase((*d->data_lists)[i].begin());
+    }
+  }
 
-  
+  //Graph Stuff
+  double x_vals[400];
+  double y_vals[400];
+  cout << "GETTING GRAPH VALUES \n";
+  for(int i =0; i < NUM_STREAMS; i++) {
+    for(int z = 0; z < (*d->data_lists)[i].size(); z++) {
+      x_vals[z] = z;
+      y_vals[z] = (* d->data_lists)[i][z];
+    }
+    qpwSetCurveData(p, Plot, i, (*d->data_lists)[i].size(), x_vals, y_vals);
+  }
+  cout << "REPLOT \n";
+  qpwReplot(p, Plot);
+  cout << "AMP " << d->amp << " \n";
   return 0;
 }
 
@@ -70,6 +126,7 @@ static int slotButtonReleasedEvent(PARAM *p, int id, DATA *d)
 
 static int slotTextEvent(PARAM *p, int id, DATA *d, const char *text)
 {
+  cout << "SLOT_TEXT_EVEN \n";
   if(p == NULL || id == 0 || d == NULL || text == NULL) return -1;
   try {
     d->amp = atoi(text);
@@ -77,6 +134,7 @@ static int slotTextEvent(PARAM *p, int id, DATA *d, const char *text)
   catch (int e) {
     cout << "String Parsing exception \n";
   }
+  acqui->writeIntValue("coil(1,0)", d->amp);
   return 0;
 }
 

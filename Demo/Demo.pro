@@ -7,7 +7,6 @@ CONFIG  += warn_on release console
 CONFIG  -= qt
 
 # Input
-#HEADERS += rldefine.h
 HEADERS += pvapp.h      \
            mask1_slots.h
 SOURCES += main.cpp     \
@@ -17,20 +16,26 @@ SOURCES += main.cpp     \
 unix:LIBS          += /usr/lib/libpvsmt.so -lpthread
 #unix:LIBS         += /usr/lib/libpvsid.so
 unix:INCLUDEPATH   += /opt/pvb/pvserver
-#unix:LIBS         += /usr/lib/librllib.so
-#unix:INCLUDEPATH  += /opt/pvb/rllib/lib
+unix:LIBS         += /usr/lib/librllib.so
+unix:INCLUDEPATH  += /opt/pvb/rllib/lib
 #unix:LIBS         += $(PVBDIR)/pvserver/libpvsmt.so -lpthread
 #unix:LIBS         += $(PVBDIR)/pvserver/libpvsid.so -lpthread
 #unix:INCLUDEPATH  += $(PVBDIR)/pvserver
 #unix:LIBS         += $(PVBDIR)/rllib/lib/librllib.so
-#unix:INCLUDEPATH  += $(PVBDIR)/rllib/lib
+unix:INCLUDEPATH  += $(PVBDIR)/rllib/lib
+
+unix:LIBS          += /usr/lib/libpvsmt.so -lpthread
+#unix:LIBS         += /usr/lib/libpvsid.so
+unix:INCLUDEPATH   += /opt/pvb/pvserver
+unix:LIBS          += /usr/lib/librllib.so
+unix:INCLUDEPATH   += /opt/pvb/rllib/lib
 }
 
 macx:LIBS          += /opt/pvb/pvserver/libpvsmt.a /usr/lib/libpthread.dylib
 #macx:LIBS         += /opt/pvb/pvserver/libpvsid.a
 macx:INCLUDEPATH   += /opt/pvb/pvserver
-#macx:LIBS         += /usr/lib/librllib.dylib
-#macx:INCLUDEPATH  += /opt/pvb/rllib/lib
+macx:LIBS         += /usr/lib/librllib.dylib
+macx:INCLUDEPATH  += /opt/pvb/rllib/lib
 
 #
 # Attention:

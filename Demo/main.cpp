@@ -10,6 +10,7 @@
 //rlModbusClient     modbus(modbusdaemon_MAILBOX,modbusdaemon_SHARED_MEMORY,modbusdaemon_SHARED_MEMORY_SIZE);
 //rlSiemensTCPClient siemensTCP(siemensdaemon_MAILBOX,siemensdaemon_SHARED_MEMORY,siemensdaemon_SHARED_MEMORY_SIZE);
 //rlPPIClient        ppi(ppidaemon_MAILBOX,ppidaemon_SHARED_MEMORY,ppidaemon_SHARED_MEMORY_SIZE);
+rlDataAcquisition *acqui;
 
 int pvMain(PARAM *p)
 {
@@ -42,7 +43,8 @@ int ret;
 int main(int ac, char **av)
 {
 PARAM p;
-
+  acqui = new rlDataAcquisition("/srv/automation/mbx/modbus1.mbx",
+                                "/srv/automation/shm/modbus1.shm",65536);
   pvInit(ac,av,&p);
   /* here you may interpret ac,av and set p->user to your data */
   pvMain(&p);
@@ -54,6 +56,8 @@ int main(int ac, char **av)
 PARAM p;
 int   s;
 
+  acqui = new rlDataAcquisition("/srv/automation/mbx/modbus1.mbx",
+                                "/srv/automation/shm/modbus1.shm",65536);
   pvInit(ac,av,&p);
   /* here you may interpret ac,av and set p->user to your data */
   while(1)

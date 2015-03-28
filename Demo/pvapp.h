@@ -15,6 +15,8 @@ static int trace=1; // todo: set trace=0 if you do not want printf() within even
 #endif
 
 #include "processviewserver.h"
+#include "rldataacquisition.h"
+
 // todo: comment me out
 //#include "rlmodbusclient.h"
 //#include "rlsiemenstcpclient.h"

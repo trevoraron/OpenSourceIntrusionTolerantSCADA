@@ -15,10 +15,10 @@ CXX           = g++
 DEFINES       = 
 CFLAGS        = -pipe -O2 -Wall -W -fPIE $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -W -fPIE $(DEFINES)
-INCPATH       = -I/usr/lib/i386-linux-gnu/qt5/mkspecs/linux-g++ -I. -I/opt/pvb/pvserver
+INCPATH       = -I/usr/lib/i386-linux-gnu/qt5/mkspecs/linux-g++ -I. -I/opt/pvb/pvserver -I/opt/pvb/rllib/lib -I$(PVBDIR)/rllib/lib -I/opt/pvb/pvserver -I/opt/pvb/rllib/lib
 LINK          = g++
 LFLAGS        = -Wl,-O1
-LIBS          = $(SUBLIBS) /usr/lib/libpvsmt.so -lpthread 
+LIBS          = $(SUBLIBS) /usr/lib/libpvsmt.so /usr/lib/librllib.so -lpthread 
 AR            = ar cqs
 RANLIB        = 
 QMAKE         = /usr/lib/i386-linux-gnu/qt5/bin/qmake
@@ -280,7 +280,12 @@ main.o: main.cpp pvapp.h \
 		/opt/pvb/pvserver/processviewserver.h \
 		/opt/pvb/pvserver/vmsgl.h \
 		/opt/pvb/pvserver/vmsglext.h \
-		/opt/pvb/pvserver/wthread.h
+		/opt/pvb/pvserver/wthread.h \
+		/opt/pvb/rllib/lib/rldataacquisition.h \
+		/opt/pvb/rllib/lib/rldefine.h \
+		/opt/pvb/rllib/lib/rlmailbox.h \
+		/opt/pvb/rllib/lib/rlsharedmemory.h \
+		/opt/pvb/rllib/lib/rlwthread.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 mask1.o: mask1.cpp pvapp.h \
@@ -288,6 +293,11 @@ mask1.o: mask1.cpp pvapp.h \
 		/opt/pvb/pvserver/vmsgl.h \
 		/opt/pvb/pvserver/vmsglext.h \
 		/opt/pvb/pvserver/wthread.h \
+		/opt/pvb/rllib/lib/rldataacquisition.h \
+		/opt/pvb/rllib/lib/rldefine.h \
+		/opt/pvb/rllib/lib/rlmailbox.h \
+		/opt/pvb/rllib/lib/rlsharedmemory.h \
+		/opt/pvb/rllib/lib/rlwthread.h \
 		mask1_slots.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mask1.o mask1.cpp
 
