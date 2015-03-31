@@ -16,7 +16,6 @@ else:
     amplitude = 20
 
 while True:
-#for x in range(0,1):
     # Calculate function values
     for i in xrange(0, len(read)):
         if amplitude:
