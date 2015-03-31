@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <iostream>
 #define NUM_STREAMS 6
+#define LEN_STORED 20
 using namespace std;
 //These are the modbus messages
 static const char *mbus_mess[] = {
@@ -83,19 +84,19 @@ static int slotNullEvent(PARAM *p, DATA *d)
   cout << "GETTING MODBUS DATA \n";
   for(int i = 0; i < NUM_STREAMS; i++){
     (* d->data_lists)[i].push_back(acqui->intValue(mbus_mess[i]));
-    if((* d->data_lists)[i].size() > 400) {
+    if((* d->data_lists)[i].size() > LEN_STORED) {
       (* d->data_lists)[i].erase((*d->data_lists)[i].begin());
     }
   }
 
   //Graph Stuff
-  double x_vals[400];
-  double y_vals[400];
+  double x_vals[LEN_STORED];
+  double y_vals[LEN_STORED];
   cout << "GETTING GRAPH VALUES \n";
   for(int i =0; i < NUM_STREAMS; i++) {
     for(int z = 0; z < (*d->data_lists)[i].size(); z++) {
       x_vals[z] = z;
-      y_vals[z] = (* d->data_lists)[i][z];
+      y_vals[z] = (* d->data_lists)[i][LEN_STORED - z - 1];
     }
     qpwSetCurveData(p, Plot, i, (*d->data_lists)[i].size(), x_vals, y_vals);
   }
