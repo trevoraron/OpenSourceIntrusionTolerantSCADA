@@ -17,7 +17,7 @@
 #include <cstdlib>
 #include <iostream>
 #define NUM_STREAMS 6
-#define LEN_STORED 20
+#define LEN_STORED 100
 using namespace std;
 //These are the modbus messages
 static const char *mbus_mess[] = {
@@ -60,7 +60,7 @@ static int slotInit(PARAM *p, DATA *d)
   qpwSetLegendFrameStyle(p, Plot, Box|Sunken);
 
   //axes
-  qpwSetAxisTitle(p, Plot, xBottom, "Time");
+  qpwSetAxisTitle(p, Plot, xBottom, "Last 100 seconds");
   qpwSetAxisTitle(p, Plot, yLeft, "Value");
  
   //Curves
@@ -68,7 +68,7 @@ static int slotInit(PARAM *p, DATA *d)
   for(int i =0; i < NUM_STREAMS; i++) {
     qpwInsertCurve(p, Plot, i, mbus_mess[i]);
     //Maybe change, I was just winging the numbers, no idea how this will look
-    qpwSetCurvePen(p, Plot, i, 25*i, 100, 30 * i);
+    qpwSetCurvePen(p, Plot, i, 25*i, 100, 30 * i, 4);
     qpwSetCurveYAxis(p, Plot, i, yLeft);
   }
 
@@ -96,7 +96,7 @@ static int slotNullEvent(PARAM *p, DATA *d)
   for(int i =0; i < NUM_STREAMS; i++) {
     for(int z = 0; z < (*d->data_lists)[i].size(); z++) {
       x_vals[z] = z;
-      y_vals[z] = (* d->data_lists)[i][LEN_STORED - z - 1];
+      y_vals[z] = (* d->data_lists)[i][z];
     }
     qpwSetCurveData(p, Plot, i, (*d->data_lists)[i].size(), x_vals, y_vals);
   }
@@ -135,7 +135,7 @@ static int slotTextEvent(PARAM *p, int id, DATA *d, const char *text)
   catch (int e) {
     cout << "String Parsing exception \n";
   }
-  acqui->writeIntValue("coil(1,0)", d->amp);
+  acqui->writeIntValue("register(1,0)", d->amp);
   return 0;
 }
 
