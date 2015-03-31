@@ -135,7 +135,7 @@ static void putDataToIni(int slave, int start_adr, int byte_count, unsigned char
 
   ini->printf(slavename,name,"%s",buf);
   // Commit the changes to mtss.ini
-  ini->write(inifilename.txt());
+  ini->write(inifilename.text());
   if(show_write_requests) printf("putDataToIni::    slave=%d %s data=%s\n", slave, name, buf);
 }
 
