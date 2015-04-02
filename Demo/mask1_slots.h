@@ -16,13 +16,12 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
-#define NUM_STREAMS 6
+#define NUM_STREAMS 4
 #define LEN_STORED 100
 using namespace std;
 //These are the modbus messages
+//coilStatus(1,0)
 static const char *mbus_mess[] = {
-  "inputStatus(1,0)",
-  "inputStatus(1,8)",
   "coilStatus(1,0)",
   "holdingRegisters(1,0)",
   "holdingRegisters(1,1)",
@@ -65,14 +64,31 @@ static int slotInit(PARAM *p, DATA *d)
  
   //Curves
   cout<< "SETTING UP CURVES \n";
-  for(int i =0; i < NUM_STREAMS; i++) {
+  for(int i =1; i < NUM_STREAMS; i++) {
     qpwInsertCurve(p, Plot, i, mbus_mess[i]);
     //Maybe change, I was just winging the numbers, no idea how this will look
-    qpwSetCurvePen(p, Plot, i, 25*i, 100, 30 * i, 4);
+    qpwSetCurvePen(p, Plot, i, 75*i, 50*i, 45 * i, 4);
     qpwSetCurveYAxis(p, Plot, i, yLeft);
   }
 
 
+  //Plot 2
+  qpwEnableOutline(p, Plot2, 1);
+  qpwSetOutlinePen(p, Plot2, GREEN);
+
+  //legend
+  qpwSetAutoLegend(p, Plot2, 1);
+  qpwEnableLegend(p, Plot2, 1);
+  qpwSetLegendPos(p, Plot2, 1);
+  qpwSetLegendFrameStyle(p, Plot2, Box|Sunken);
+
+  //axes
+  qpwSetAxisTitle(p, Plot2, xBottom, "Last 100 seconds");
+  qpwSetAxisTitle(p, Plot2, yLeft, "Value");
+  //Coil Curve Set Up
+  qpwInsertCurve(p, Plot2, 0, mbus_mess[0]);
+  qpwSetCurvePen(p, Plot2, 0, RED, 4);
+  qpwSetCurveYAxis(p, Plot2, 0, yLeft);
   return 0;
 }
 
@@ -98,10 +114,16 @@ static int slotNullEvent(PARAM *p, DATA *d)
       x_vals[z] = z;
       y_vals[z] = (* d->data_lists)[i][z];
     }
-    qpwSetCurveData(p, Plot, i, (*d->data_lists)[i].size(), x_vals, y_vals);
+    if(i==0){
+      qpwSetCurveData(p, Plot2, i, (*d->data_lists)[i].size(), x_vals, y_vals);
+    }
+    else {
+      qpwSetCurveData(p, Plot, i, (*d->data_lists)[i].size(), x_vals, y_vals);
+    }
   }
   cout << "REPLOT \n";
   qpwReplot(p, Plot);
+  qpwReplot(p, Plot2);
   cout << "AMP " << d->amp << " \n";
   return 0;
 }

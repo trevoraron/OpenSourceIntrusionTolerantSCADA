@@ -14,6 +14,9 @@ enum {
   amp,
   obj2,
   Plot,
+  obj3,
+  Plot2,
+  obj5,
   ID_END_OF_WIDGETS
 };
 
@@ -24,10 +27,16 @@ enum {
   "amp",
   "obj2",
   "Plot",
+  "obj3",
+  "Plot2",
+  "obj5",
   "ID_END_OF_WIDGETS",
   ""};
 
   static const char *toolTip[] = {
+  "",
+  "",
+  "",
   "",
   "",
   "",
@@ -41,6 +50,9 @@ enum {
   "",
   "",
   "",
+  "",
+  "",
+  "",
   ""};
 
   static const int widgetType[ID_END_OF_WIDGETS+1] = {
@@ -49,6 +61,9 @@ enum {
   TQLineEdit,
   TQLabel,
   TQwtPlotWidget,
+  TQLabel,
+  TQwtPlotWidget,
+  TQLabel,
   -1 };
 
 static int generated_defineMask(PARAM *p)
@@ -78,11 +93,28 @@ static int generated_defineMask(PARAM *p)
   pvSetFont(p,obj2,"Ubuntu",11,0,0,0,0);
 
   pvQwtPlotWidget(p,Plot,0,10,1000);
-  pvSetGeometry(p,Plot,162,153,400,400);
+  pvSetGeometry(p,Plot,27,216,600,400);
   qpwSetCanvasBackground(p,Plot,224,224,224);
   qpwEnableAxis(p,Plot,yLeft);
   qpwEnableAxis(p,Plot,xBottom);
   pvSetFont(p,Plot,"Ubuntu",11,0,0,0,0);
+
+  pvQLabel(p,obj3,0);
+  pvSetGeometry(p,obj3,291,159,99,30);
+  pvSetText(p,obj3,pvtr("Registers"));
+  pvSetFont(p,obj3,"Ubuntu",11,0,0,0,0);
+
+  pvQwtPlotWidget(p,Plot2,0,10,1000);
+  pvSetGeometry(p,Plot2,651,216,600,400);
+  qpwSetCanvasBackground(p,Plot2,224,224,224);
+  qpwEnableAxis(p,Plot2,yLeft);
+  qpwEnableAxis(p,Plot2,xBottom);
+  pvSetFont(p,Plot2,"Ubuntu",11,0,0,0,0);
+
+  pvQLabel(p,obj5,0);
+  pvSetGeometry(p,obj5,939,165,99,30);
+  pvSetText(p,obj5,pvtr("Coils"));
+  pvSetFont(p,obj5,"Ubuntu",11,0,0,0,0);
 
 
   pvEndDefinition(p);
