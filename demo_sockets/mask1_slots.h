@@ -120,7 +120,7 @@ static int slotNullEvent(PARAM *p, DATA *d)
 
 
   for(int i = 0; i < NUM_STREAMS; i++){
-    (* d->data_lists)[i].push_back(acqui->intValue(mbus_mess[i]));
+    (* d->data_lists)[i].push_back(Read_From_DAD(dad_sock));
     if((* d->data_lists)[i].size() > LEN_STORED) {
       (* d->data_lists)[i].erase((*d->data_lists)[i].begin());
     }
@@ -178,7 +178,7 @@ static int slotTextEvent(PARAM *p, int id, DATA *d, const char *text)
   catch (int e) {
     cout << "String Parsing exception \n";
   }
-  acqui->writeIntValue("register(1,0)", d->amp);
+  Write_To_DAD(dad_sock, HOLDING_REGISTERS, 1, 0, d->amp);
   return 0;
 }
 
