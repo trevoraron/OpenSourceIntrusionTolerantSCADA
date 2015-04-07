@@ -27,16 +27,6 @@ extern "C" {
 
 extern int dad_sock;
 
-
-//These are the modbus messages
-//coilStatus(1,0)
-static const char *mbus_mess[] = {
-  "coilStatus(1,0)",
-  "holdingRegisters(1,0)",
-  "holdingRegisters(1,1)",
-  "inputRegisters(1,0)",
-  "inputRegisters(1,10)",
-};
 //extern rlDataAcquisition *acqui;
 
 typedef struct // (todo: define your data structure here)
@@ -79,7 +69,7 @@ static int slotInit(PARAM *p, DATA *d)
   //Curves
   cout<< "SETTING UP CURVES \n";
   for(int i =1; i < NUM_STREAMS; i++) {
-    qpwInsertCurve(p, Plot, i, mbus_mess[i]);
+    qpwInsertCurve(p, Plot, i, d->toolTip[i]);
     //Maybe change, I was just winging the numbers, no idea how this will look
     qpwSetCurvePen(p, Plot, i, 75*i, 50*i, 45 * i, 4);
     qpwSetCurveYAxis(p, Plot, i, yLeft);
@@ -100,7 +90,7 @@ static int slotInit(PARAM *p, DATA *d)
   qpwSetAxisTitle(p, Plot2, xBottom, "Last 100 seconds");
   qpwSetAxisTitle(p, Plot2, yLeft, "Value");
   //Coil Curve Set Up
-  qpwInsertCurve(p, Plot2, 0, mbus_mess[0]);
+  qpwInsertCurve(p, Plot2, 0, d->toolTip[0]);
   qpwSetCurvePen(p, Plot2, 0, RED, 4);
   qpwSetCurveYAxis(p, Plot2, 0, yLeft);
   return 0;
