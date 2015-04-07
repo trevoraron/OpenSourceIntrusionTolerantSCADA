@@ -35,14 +35,12 @@ enum {
 
   static const char *toolTip[] = {
   "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  "",
-  ""};
+  "coilStatus(1,0)",
+  "holdingRegisters(1,0)",
+  "holdingRegisters(1,1)",
+  "inputRegisters(1,0)",
+  "inputRegisters(1,10)",
+  };
 
   static const char *whatsThis[] = {
   "",
