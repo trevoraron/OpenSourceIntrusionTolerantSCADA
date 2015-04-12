@@ -6,13 +6,33 @@
 //  email            : lehrig@t-online.de
 //***************************************************************************
 #include "pvapp.h"
+#include <thread>
 // todo: comment me out. you can insert these objects as extern in your masks.
 //rlModbusClient     modbus(modbusdaemon_MAILBOX,modbusdaemon_SHARED_MEMORY,modbusdaemon_SHARED_MEMORY_SIZE);
 //rlSiemensTCPClient siemensTCP(siemensdaemon_MAILBOX,siemensdaemon_SHARED_MEMORY,siemensdaemon_SHARED_MEMORY_SIZE);
 //rlPPIClient        ppi(ppidaemon_MAILBOX,ppidaemon_SHARED_MEMORY,ppidaemon_SHARED_MEMORY_SIZE);
 #define LOC "localhost"
-
 #define PORT 5502
+
+void readFromServer(PARAM *p, int s_id) {
+    char buf[MAX_PRINTF_LENGTH + 1];
+    while(1) {
+        //Read
+        tcp_rec(&s_id, buf, sizeof(buf) - 1);
+        //Send 
+        pvtcpsend(p, buf, strlen(buf));
+    }
+}
+
+void readFromBrowser(PARAM *p, int s_id) {
+    char event[MAX_EVENT_LENGTH];
+    pvClearMessageQueue(p);
+    while(1) {
+        pvPollEvent(p,event);
+        tcp_send(&sock_id, event, strlen(event));
+    }
+}
+
 int pvMain(PARAM *p)
 {
 int ret;
@@ -28,20 +48,8 @@ int soc_id;
   //TODO: get addrews and port of tcp_con
   tcp_init();
   soc_id = tcp_con(LOC, PORT);
-
-  while(1)
-  {
-    if(trace) printf("show_mask%d\n", ret);
-    switch(ret)
-    {
-      case 1:
-        pvStatusMessage(p,-1,-1,-1,"mask1");
-        ret = show_mask1(p, soc_id);
-        break;
-      default:
-        return 0;
-    }
-  }
+  std::thread server (readFromServer,p,soc_id);
+  std::thread browser (readFromBrowser,p,soc_id);
 }
 
 #ifdef USE_INETD
