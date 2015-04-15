@@ -29,3 +29,11 @@ int browser_accept(int pvb_sock_fd);
 /*port is port to connect to */
 /*Returns list of file descriptors to read and write too */
 int * server_sockets(char * server_addr[], int num_servers, int port);
+
+/*Read buf_size bytes into buffer */
+/*Return bytes read if succesfull, return -1 if fail */
+/*pass the buffer, size, and the socket to read */
+int read_socket(char * buffer, int buf_size, int socket);
+
+
+#endif /* SOCKET_SETUP */

@@ -40,6 +40,7 @@ int browser_accept(int pvb_sock_fd) {
         error("ERROR on accept");
         exit(0);
     }
+    return pvb_newsockfd;
 
 }
 
@@ -75,4 +76,20 @@ int * server_sockets(char * server_addr[], int num_servers, int port) {
         }
     }
     return pvs_sockfd;
+}
+
+/*Read buf_size bytes into buffer */
+/*Return bytes read if succesfull, return -1 if fail */
+/*pass the buffer, size, and the socket to read */
+int read_socket(char * buffer, int buf_size, int socket) {
+    int bytes_read = 0;
+    int n = 0;
+    while(bytes_read < buf_size) {
+        n = read(socket, buffer + bytes_read, buf_size - bytes_read);
+        if (n < 0) {
+            return -1;
+        }
+        bytes_read += n; 
+    }
+    return bytes_read;
 }
