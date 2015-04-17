@@ -1,5 +1,5 @@
 //###############################################################
-//# mask1_slots.h for ProcessViewServer created: Mon Apr 6 14:32:23 2015
+//# mask1_slots.h for ProcessViewServer created: Sat Apr 11 21:36:43 2015
 //# please fill out these slots
 //# here you find all possible events
 //# Yours: Lehrig Software Engineering
@@ -14,7 +14,6 @@
 
 typedef struct // (todo: define your data structure here)
 {
-  char * mask;
 }
 DATA;
 
