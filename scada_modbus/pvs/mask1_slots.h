@@ -26,12 +26,12 @@ static int slotInit(PARAM *p, DATA *d)
   memset(d,0,sizeof(DATA));
 
   d->data_lists = new vector<vector<double> >(NUM_STREAMS, vector<double>());
+  d->offsets = new vector<vector<double> >(NUM_STREAMS, vector<double>());
   for(int i = 0; i < LEN_STORED; i++) {
     d->overfr[i] = 61.5;
     d->underfr[i] = 58.5;
   }
-  d->tx_A_status = 0;
-  d->tx_B_status = 0;
+  d->tx_switch = -1;
   Init_Master(d);
 
   qpwInsertCurve(p, tx_A, 0, "Transformer A");
@@ -55,33 +55,46 @@ static int slotNullEvent(PARAM *p, DATA *d)
 {
   if(p == NULL || d == NULL) return -1;
 
-  if(d->tx_A_status == 0)
+  if(d->tx_switch == 0) {
     pvPrintf(p,tx_A_but,"Disabled");
-  else pvPrintf(p,tx_A_but,"Enabled");
-
-  if(d->tx_B_status == 0)
+    pvPrintf(p,tx_B_but,"Enabled");
+  }
+  else if(d->tx_switch == 1) {  
+    pvPrintf(p,tx_A_but,"Enabled");
     pvPrintf(p,tx_B_but,"Disabled");
-  else pvPrintf(p,tx_B_but,"Enabled");
+  }
+  else {
+    pvPrintf(p,tx_A_but,"Unknown");
+    pvPrintf(p,tx_B_but,"Unknown");
+  }
 
-  //Graph diagram
+  // Graph diagram
   int i; 
   unsigned int z;
   double x_vals[LEN_STORED];
   double y_vals[LEN_STORED];
+  double last[LEN_STORED];
   for(i = 0; i < NUM_STREAMS; i++) {
     for(z = 0; z < (*d->data_lists)[i].size(); z++) {
       x_vals[z] = z;
-      y_vals[z] = (*d->data_lists)[i][z];
+      y_vals[z] = (*d->data_lists)[i][z] + 0.01 * (*d->offsets)[i][z];
+      last[i] = y_vals[z];
     }
-    if(i == 0){
+    if(i == 0) {
       qpwSetCurveData(p, tx_A, 2, (*d->data_lists)[i].size(), x_vals, d->underfr);
       qpwSetCurveData(p, tx_A, 3, (*d->data_lists)[i].size(), x_vals, d->overfr);
       qpwSetCurveData(p, tx_A, i, (*d->data_lists)[i].size(), x_vals, y_vals);
+      // Compare the last value to thresholds and display an alarm if necessary
+      if(last[i] > 0 && (last[i] < 58.5 || last[i] > 61.5))
+        pvSetBackgroundColor(p, tx_A_lab, 255, 0, 0);
     }
     else {
       qpwSetCurveData(p, tx_B, 4, (*d->data_lists)[i].size(), x_vals, d->underfr);
       qpwSetCurveData(p, tx_B, 5, (*d->data_lists)[i].size(), x_vals, d->overfr);
       qpwSetCurveData(p, tx_B, i, (*d->data_lists)[i].size(), x_vals, y_vals);
+      // Compare the last value to thresholds and display an alarm if necessary
+      if(last[i] > 0 && (last[i] < 58.5 || last[i] > 61.5))
+        pvSetBackgroundColor(p, tx_B_lab, 255, 0, 0);
     }
   }
   qpwReplot(p, tx_A);
@@ -94,27 +107,12 @@ static int slotButtonEvent(PARAM *p, int id, DATA *d)
 {
   if(p == NULL || id == 0 || d == NULL) return -1;
 
-  if(id == tx_A_but) {
-    if(d->tx_A_status == 0) {
-      d->tx_A_status = 1;
-      pvPrintf(p,tx_A_but,"Enabled");
-    }
-    else {
-      d->tx_A_status = 0;
-      pvPrintf(p,tx_A_but,"Disabled");
-    }
-    Write_To_DAD(dad_sock, COIL_STATUS, 1, 0, d->tx_A_status);
-  }
-  else if(id == tx_B_but) {
-    if(d->tx_B_status == 0) {
-      d->tx_B_status = 1;
-      pvPrintf(p,tx_B_but,"Enabled");
-    }
-    else {
-      d->tx_B_status = 0;
-      pvPrintf(p,tx_B_but,"Disabled");
-    }
-    Write_To_DAD(dad_sock, COIL_STATUS, 1, 1, d->tx_B_status);
+  if(id == tx_A_but || id == tx_B_but) {
+    if(d->tx_switch == 0)
+      d->tx_switch = 1;
+    else
+      d->tx_switch = 0;
+    Write_To_DAD(dad_sock, COIL_STATUS, 1, 0, d->tx_switch);
   }
 
   return 0;

@@ -5,7 +5,7 @@
  *
  * Creator: Marco
  * Created: 3/27/2015
- * Last modified: 4/17/2015
+ * Last modified: 4/20/2015
  */
 
 #include <vector>
@@ -18,11 +18,11 @@ using namespace std;
 
 typedef struct // (todo: define your data structure here)
 {
-  int tx_A_status;
-  int tx_B_status;
+  int tx_switch;
   double overfr[LEN_STORED];
   double underfr[LEN_STORED];
   vector<vector<double> > * data_lists;
+  vector<vector<double> > * offsets;
 }
 DATA;
 

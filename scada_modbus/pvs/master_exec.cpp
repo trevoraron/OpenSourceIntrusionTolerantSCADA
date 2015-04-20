@@ -5,7 +5,7 @@
  *
  * Creator: Marco
  * Created: 3/27/2015
- * Last modified: 4/17/2015
+ * Last modified: 4/20/2015
  */
 
 #include <stdio.h>
@@ -79,30 +79,36 @@ void Process_Message(int s, scada_message *mess) {
   modbus_tcp_mess *mod;
   char *str;
   char name[100];
-  double val;
 
   mod = (modbus_tcp_mess *)(mess + 1);
 
   // There are two kinds of messages received from RTU
   // 1) COIL_STATUS: specifies if a switch is open/closed
   // 2) INPUT_REGISTERS: contains the voltage frequency 
-  //    of two different transformer. This value is stored 
-  //    in a vector. The mod->start_add parameter determines 
-  //    if the transformer is the primary (mod->start_add = 0) 
-  //    or backup (mod->start_add = 1).
+  //    and its offset of two different transformer. These 
+  //    values are stored in two vectors. The mod->start_add 
+  //    parameter determines if the value is a frequency
+  //    if the transformer is the primary 
+  //    (mod->start_add = 0, primary transformer - 
+  //    mod->start_add = 1, backup transformer) 
+  //    or an offset (mod->start_add = 2 or mod->start_add = 3 
+  //    for primary and backup respectively).
   if(d != NULL) {
     if(mod->var == COIL_STATUS) {
-      if(mod->start_add == 0)
-        d->tx_A_status = mod->value;
-      else d->tx_B_status = mod->value;
+      d->tx_switch = mod->value;
     }
     else if(mod->var == INPUT_REGISTERS) {
-      // The actual value read from RTU is scaled to represent
-      // the offset from nominal standard frequency
-      val = (double)mod->value * 0.001 + 60;
-      (*d->data_lists)[mod->start_add].push_back(val);
-      if((*d->data_lists)[mod->start_add].size() > LEN_STORED) {
-        (*d->data_lists)[mod->start_add].erase((*d->data_lists)[mod->start_add].begin());
+      // Voltage
+      if(mod->start_add == 0 || mod->start_add == 1) {
+        (*d->data_lists)[mod->start_add].push_back(mod->value);
+        if((*d->data_lists)[mod->start_add].size() > LEN_STORED)
+          (*d->data_lists)[mod->start_add].erase((*d->data_lists)[mod->start_add].begin());
+      }
+      // Offset
+      else {
+        (*d->offsets)[mod->start_add - 2].push_back(mod->value);
+        if((*d->offsets)[mod->start_add - 2].size() > LEN_STORED)
+          (*d->offsets)[mod->start_add - 2].erase((*d->offsets)[mod->start_add - 2].begin());
       }
     }
   }
