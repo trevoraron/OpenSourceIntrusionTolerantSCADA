@@ -46,9 +46,9 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = main.cpp \
-	
+		socket_setup.cpp 
 OBJECTS       = main.o \
-		
+		socket_setup.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/shell-unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -276,7 +276,7 @@ compiler_clean:
 
 ####### Compile
 
-main.o: main.cpp pvapp.h \
+main.o: main.cpp \
 		/opt/pvb/pvserver/processviewserver.h \
 		/opt/pvb/pvserver/vmsgl.h \
 		/opt/pvb/pvserver/vmsglext.h \
