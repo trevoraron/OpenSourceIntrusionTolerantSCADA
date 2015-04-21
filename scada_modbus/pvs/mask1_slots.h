@@ -81,20 +81,32 @@ static int slotNullEvent(PARAM *p, DATA *d)
       last[i] = y_vals[z];
     }
     if(i == 0) {
+     // Compare the last value to thresholds and display an alarm if necessary
+      if(last[i] > 0 && (last[i] < 58.5 || last[i] > 61.5)) {
+        pvSetBackgroundColor(p, tx_A_lab, 255, 0, 0);
+        qpwSetCurvePen(p, tx_A, 0, BLUE, 4);
+      }
+      else {
+        pvSetBackgroundColor(p, tx_A_lab, 0, 255, 0);
+        qpwSetCurvePen(p, tx_A, 0, GREEN, 4);
+      }
       qpwSetCurveData(p, tx_A, 2, (*d->data_lists)[i].size(), x_vals, d->underfr);
       qpwSetCurveData(p, tx_A, 3, (*d->data_lists)[i].size(), x_vals, d->overfr);
       qpwSetCurveData(p, tx_A, i, (*d->data_lists)[i].size(), x_vals, y_vals);
-      // Compare the last value to thresholds and display an alarm if necessary
-      if(last[i] > 0 && (last[i] < 58.5 || last[i] > 61.5))
-        pvSetBackgroundColor(p, tx_A_lab, 255, 0, 0);
     }
     else {
+      // Compare the last value to thresholds and display an alarm if necessary
+      if(last[i] > 0 && (last[i] < 58.5 || last[i] > 61.5)) {
+        pvSetBackgroundColor(p, tx_B_lab, 255, 0, 0);
+        qpwSetCurvePen(p, tx_B, 0, BLUE, 4);
+      }
+      else {
+        pvSetBackgroundColor(p, tx_B_lab, 0, 255, 0);
+        qpwSetCurvePen(p, tx_B, 0, GREEN, 4);
+      }
       qpwSetCurveData(p, tx_B, 4, (*d->data_lists)[i].size(), x_vals, d->underfr);
       qpwSetCurveData(p, tx_B, 5, (*d->data_lists)[i].size(), x_vals, d->overfr);
       qpwSetCurveData(p, tx_B, i, (*d->data_lists)[i].size(), x_vals, y_vals);
-      // Compare the last value to thresholds and display an alarm if necessary
-      if(last[i] > 0 && (last[i] < 58.5 || last[i] > 61.5))
-        pvSetBackgroundColor(p, tx_B_lab, 255, 0, 0);
     }
   }
   qpwReplot(p, tx_A);
