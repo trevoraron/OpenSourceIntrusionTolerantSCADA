@@ -52,12 +52,12 @@ int pvMain(PARAM *p)
     temp_mask = mask;
     ret = select( FD_SETSIZE, &temp_mask, &empty_mask, &empty_mask, NULL );
     if ( ret > 0 ) {
-      printf( "Message received\n" );
+//      printf( "Message received\n" );
       // Message from browser
       if ( FD_ISSET( b_sock, &temp_mask ) ) {
         //pvtcpreceive( p, event, MAX_EVENT_LENGTH );
         read_socket( b_sock, event, MAX_EVENT_LENGTH );
-        printf( "Received event from browser: %s\n", event );
+//        printf( "Received event from browser: %s\n", event );
 	
         // send to servers
         for ( i = 0; i < NUM_SERVERS; i++ )
@@ -68,7 +68,7 @@ int pvMain(PARAM *p)
       for ( i = 0; i < NUM_SERVERS; i++ ) {
         if ( FD_ISSET( s_sock[i], &temp_mask ) ) {
           read_socket( s_sock[i], event, MAX_EVENT_LENGTH );
-          printf( "Received from server: %s\n", event );
+//          printf( "Received from server: %s\n", event );
 
           // For now, simply relay
           send( b_sock, event, strlen(event), 0 );
