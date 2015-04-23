@@ -1,0 +1,65 @@
+This is the v0.9.1 (July 2001) distribution of the stdutil library.
+
+Note, that for v1.0.0 I intend to pretty much destroy any backward
+compatability, as I have a growing distaste for my naming conventions
+and function/type names. So just be warned, you may want to wait
+for that version -- although it could be several months before I
+get around to and finish it.
+
+Changes since v0.9.0 (Nov 2000):
+
+Wrote more documentation on the data structures, including an HTML
+interface. Changed build system to be a bit more autoconf'ish.  
+Rearranged structure of distribution a little.
+
+DESCRIPTION:
+
+The stdutil library is a toolkit of C data structures and functions.
+
+LICENSE: 
+
+The license for use of the stdutil library or its code is contained in
+the file STDUTIL_LICENSE found in the root of this distribution.
+
+DOCUMENTATION:
+
+Simply open up index.html with a browser or visit
+http://www.cnds.jhu.edu/software/stdutil or look directly at the man
+pages contained in the man/ directory.
+
+BUILDING: 
+
+To build this library run make in the root of this distribution. This
+will build stdutil.a and several test programs and place them,
+respectively, in the bin and lib directories of this distribution. 
+
+*** Anybody who wants to contribute a more complex build and install
+setup, please feel free, as this is not one of my strong points. ***
+
+To build a checked or debug version of the library edit src/Makefile.in
+before running make. There you can uncomment definitions for the
+variables STD_USE_EXCEPTIONS, STD_CONSTRUCT_CHECKS, STD_BOUNDS_CHECKS
+and STD_SAFE_CHECKS. The effects of these different variables is either
+self-evident or described in Makefile.in.
+
+INSTALLING:
+
+Feel free to move the library and documentation to your standard system
+directories. Then go into the src directory and do a recursive copy of
+the _DIRECTORY_ stdutil into a standard include path (e.g. cp -r
+src/stdutil /usr/include).
+
+LINKING:
+
+Just make sure the include files are available and link with
+libstdutil.a.
+
+PROBLEMS:
+
+Please report bugs and/or bug fixes to jschultz@cnds.jhu.edu with a
+gdb compatible core (if possible) and any information that could help
+me fix the problem in my distributions.
+
+Enjoy,
+John Schultz <jschultz@cnds.jhu.edu>
+July 2001

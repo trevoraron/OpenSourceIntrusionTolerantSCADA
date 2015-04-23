@@ -1,0 +1,401 @@
+<HTML><HEAD><TITLE>Manpage of FL_version</TITLE>
+</HEAD>
+
+<body bgcolor="#FFFFFF">
+
+<!--#include virtual="/includes/header-a" -->
+
+<a href="http://www.cnds.jhu.edu/software/stdutil">
+<img src="stdutil_title.gif" alt="Stdutil Library" border=0>
+</a>
+
+<!--#include virtual="/includes/header-b" -->
+
+<H1>STDDLL</H1>
+Section: User Manuals (3)<BR>Updated: NOV 2000<BR>
+<HR>
+
+<H2>NAME</H2>
+
+<P>
+stddll, stddll_construct, stddll_copy_construct, stddll_destruct, stddll_size, stddll_empty, stddll_push_front, stddll_pop_front, stddll_push_back, stddll_pop_back, stddll_multi_push_front, stddll_multi_pop_front, stddll_multi_push_back, stddll_multi_pop_back, stddll_insert, stddll_erase, stddll_repeat_insert, stddll_multi_insert, stddll_multi_erase, stddll_resize, stddll_clear, stddll_begin, stddll_end, stddll_last, stddll_get, stddll_max_size, stddll_val_size - operations on a stddll, a list data structure
+<P>
+<H2>SYNOPSIS</H2>
+
+<P>
+<B>#include &lt;stdutil/stddll.h&gt;</B>
+
+<P>
+<B>int stddll_construct(stddll *</B><I>dll</I><B>, size_t </B><I>sizeof_val</I><B>);</B>
+
+<P>
+<B>int stddll_copy_construct(stddll *</B><I>dst</I><B>, const stddll *</B><I>src</I><B>);</B>
+
+<P>
+<B>void stddll_destruct(stddll *</B><I>dll</I><B>);</B>
+
+<P>
+<B>size_t stddll_size(const stddll *</B><I>dll</I><B>);</B>
+
+<P>
+<B>stdbool stddll_empty(const stddll *</B><I>dll</I><B>);</B>
+
+<P>
+<B>int stddll_push_front(stddll *</B><I>dll</I><B>, const void *</B><I>val</I><B>);</B>
+
+<P>
+<B>int stddll_pop_front(stddll *</B><I>dll</I><B>);</B>
+
+<P>
+<B>int stddll_push_back(stddll *</B><I>dll</I><B>, const void *</B><I>val</I><B>);</B>
+
+<P>
+<B>int stddll_pop_back(stddll *</B><I>dll</I><B>);</B>
+
+<P>
+<B>int stddll_multi_push_front(stddll *</B><I>dll</I><B>, const void *</B><I>vals</I><B>, size_t </B><I>num_push</I><B>);</B>
+
+<P>
+<B>int stddll_multi_pop_front(stddll *</B><I>dll</I><B>, size_t </B><I>num_pop</I><B>);</B>
+
+<P>
+<B>int stddll_multi_push_back(stddll *</B><I>dll</I><B>, const void *</B><I>vals</I><B>, size_t </B><I>num_push</I><B>);</B>
+
+<P>
+<B>int stddll_multi_pop_back(stddll *</B><I>dll</I><B>, size_t </B><I>num_pop</I><B>);</B>
+
+<P>
+<B>stddll_it *stddll_insert(stddll_it *</B><I>it</I><B>, const void *</B><I>val</I><B>);</B>
+
+<P>
+<B>stddll_it *stddll_erase(stddll_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>stddll_it *stddll_repeat_insert(stddll_it *</B><I>it</I><B>, const void *</B><I>val</I><B>, size_t </B><I>num_times</I><B>);</B>
+
+<P>
+<B>stddll_it *stddll_multi_insert(stddll_it *</B><I>it</I><B>, const void *</B><I>vals</I><B>, size_t </B><I>num_insert</I><B>);</B>
+
+<P>
+<B>stddll_it *stddll_multi_erase(stddll_it *</B><I>it</I><B>, size_t </B><I>num_erase</I><B>);</B>
+
+<P>
+<B>int stddll_resize(stddll *</B><I>dll</I><B>, size_t </B><I>num_elems</I><B>);</B>
+
+<P>
+<B>int stddll_clear(stddll *</B><I>dll</I><B>);</B>
+
+<P>
+<B>stddll_it *stddll_begin(const stddll *</B><I>dll</I><B>, stddll_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>stddll_it *stddll_end(const stddll *</B><I>dll</I><B>, stddll_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>stddll_it *stddll_last(const stddll *</B><I>dll</I><B>, stddll_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>stddll_it *stddll_get(const stddll *</B><I>dll</I><B>, stddll_it *</B><I>it</I><B>, size_t </B><I>elem_num</I><B>);</B>
+
+<P>
+<B>size_t stddll_max_size(const stddll *</B><I>dll</I><B>);</B>
+
+<P>
+<B>size_t stddll_val_size(const stddll *</B><I>dll</I><B>);</B>
+
+<P>
+<H2>DESCRIPTION</H2>
+
+<P>
+stddll is a generic data structure that contains, by value, a user
+defined sequence of same sized values. The values can be referenced in
+worst case linear O(n) time by their 0-based index in the sequence,
+where n is the number of values in the list. This data structure is
+the equivalent of a doubly linked list in other languages. This
+structure is well suited to applications where insertions at arbitrary
+points in a user defined sequence often occur.  Some obvious uses of a
+stddll are as an efficient stack or as a FIFO queue.
+<P>
+Before a stddll can legally be used it must be successfully
+initialized.
+<B>stddll_construct</B>
+
+dynamically initializes the stddll object pointed to by
+<I>dll</I>
+
+to contain values of size 
+<I>sizeof_val</I>
+
+bytes. A list initialized using this method initially contains no
+values.
+<B>stddll_copy_construct</B>
+
+makes 
+<I>dst</I>
+
+contain a clone (copy by value) of the sequence of values that the
+successfully initialized
+<I>src</I>
+
+list contains. The clone list has the same operational parameters
+(i.e. - sizeof_val) as the source list. It is illegal to call a
+constructor on an already successfully constructed stddll -- doing so
+will cause memory leaks at best. When a list is no longer in use its
+memory should be released by calling
+<B>stddll_destruct</B>
+
+on it. Once a stddll has been destructed it must be successfully
+initialized again before being legally used.
+<P>
+<B>stddll_size</B>
+
+indicates the current number of values contained in the list.
+<B>stddll_empty</B>
+
+indicates whether or not the list contains no values.
+<P>
+stddll stores its values as a doubly linked (forwards and backwards)
+node list, where each node is allocated independently and contains a
+value. Due to this scheme stddll supports fast stack operations
+(push and pop) onto both the beginning and the end of the sequence.
+Push and pop operations run in linear O(m) time, where m is the number
+of values being pushed or popped.
+<B>stddll_push_front </B>
+
+pushes the referenced value onto the beginning of the list.
+<B>stddll_pop_front</B>
+
+pops the first element off of the front of the list.
+<B>stddll_push_back</B>
+
+pushes the referenced value onto the end of the list.
+<B>stddll_pop_back</B>
+
+pops the last value off of the end of the list.
+<B>stddll_multi_push_front</B>
+
+prepends an array of 
+<I>num_push</I>
+
+values onto the beginning of the list.
+<B>stddll_multi_pop_front</B>
+
+pops the first 
+<I>num_pop</I>
+
+values off of the beginning of the list.
+<B>stddll_multi_push_back </B>
+
+appends an array of 
+<I>num_push</I>
+
+values onto the end of the list.
+<B>stddll_multi_pop_back</B>
+
+pops the last
+<I>num_erase</I>
+
+values off of the end of the list.
+<P>
+Because stddll stores its values in a linked node list, it supports
+fast list operations (insert and erase) on the sequence in linear O(m)
+time, where m is the number of values being inserted or erased.
+<B>stddll_insert</B>
+
+inserts the referenced value into the sequence immediately before the
+value that the iterator
+<I>it</I>
+
+references. The passed iterator is set to point at the inserted
+value. All of the old values after the insertion point have their
+index in the sequence incremented by one.
+<B>stddll_multi_insert</B>
+
+inserts an array of
+<I>num_insert </I>
+
+values into the list immediately before the value that the iterator
+<I>it </I>
+
+references. The passed iterator is set to point at the first value of
+the inserted values. All of the old values after the insertion point
+have their index in the sequence incremented by
+<I>num_insert</I>.
+
+<B>stddll_repeat_insert</B>
+
+inserts the referenced value into the sequence
+<I>num_times</I>
+
+times immediately before the value that
+<I>it</I>
+
+references. The passed iterator is set to point at the first value of
+the inserted values. All of the old values after the insertion point
+have their index in the sequence incremented by
+<I>num_times</I>.
+
+<P>
+<B>stddll_erase</B>
+
+erases the value that
+<I>it</I>
+
+references. All of the remaining values after the erased value have
+their index in the sequence decremented by one. The passed iterator is
+set to point at the value that shifted into the erased position, or
+end if none.
+<B>stddll_multi_erase</B>
+
+erases the contiguous increasing subsequence of 
+<I>num_erase</I>
+
+values starting at and including the index/value that
+<I>it</I>
+
+references. All of the remaining values after the erased subsequence
+have their index in the sequence decremented by
+<I>num_erase</I>.
+
+The passed iterator is set to point at the value that shifted into the
+beginning position of the erased subsequence, or end if none. All of
+the list operations return a pointer to the passed iterator to allow
+for function composition.
+<P>
+<B>stddll_resize</B>
+
+resizes the list to contain 
+<I>num_elems</I>
+
+values. If 
+<I>num_elems</I>
+
+is smaller than the current size of the list, then this will truncate
+the sequence to only contain the first
+<I>num_elems</I>
+
+values in the list. If 
+<I>num_elems</I>
+
+is larger than the current size of the list, then additional
+uninitialized values will be added to the end of the sequence of
+values. 
+<B>stddll_clear</B>
+
+deletes all of the values contained in the sequence.
+<P>
+stddll, like the other stdutil data structures, has several methods
+for getting iterators that reference particular values in its
+sequence. stddll provides bi-directional iterators (see std_it).
+<B>stddll_begin</B>
+
+sets the iterator 
+<I>it</I>
+
+to reference the first or 0th value of the list, or, if the list is
+empty to reference the end of the list.
+<B>stddll_end</B>
+
+sets the iterator to reference the end of the list. The end of the
+list is one past the last value contained in the list and has an index
+of n.
+<B>stddll_last</B>
+
+sets the iterator to reference the nth value in the sequence (index of
+n-1). It is illegal to call stddll_last on an empty list. The above
+three iterator functions operate in constant O(1) time.
+<B>stddll_get</B>
+
+sets the iterator to reference the value with index
+<I>elem_num</I>
+
+or end if 
+<I>elem_num</I>
+
+is n.
+<I>elem_num</I>
+
+must be less than or equal to n. This operation runs in worst case
+O(n) time and is provided only as a convenience. If the application
+often references arbitrary positions in the sequence, then another
+structure (such as stdarr or stdcarr) should probably be
+considered. All of these functions return pointers to the passed
+iterator to allow function composition.
+<P>
+<B>stddll_max_size</B>
+
+returns the absolute maximum number of values a list can hold and is
+invariant across different lists.
+<P>
+<B>stddll_val_size</B>
+
+returns the size, in bytes, of the value type this list is currently
+containing.
+<P>
+<H2>RETURN VALUES</H2>
+
+<P>
+Most of the functions' return values are described in the SYNOPSIS and
+cannot fail. However, the constructors and functions that potentially
+affect the size of the list can fail. If such a function returns an
+int, then it returns zero on success and non-zero on failure. If such
+a function returns a stddll_it *, then it returns non-zero on success
+and null(0) on failure. Whenever any stddll function fails it has no
+side effects.
+<P>
+<H2>ERRORS</H2>
+
+<P>
+The constructor functions can return the following error codes:
+<DL COMPACT><DT><DD>
+<DL COMPACT>
+<DT><B>STD_ILLEGAL_PARAM </B>
+
+<DD>
+the sizeof the value type was zero.
+<P>
+<DT><B>STD_MEM_FAILURE</B>
+
+<DD>
+a memory allocation failure occurred.
+</DL></DL>
+
+<P>
+Functions that potentially affect the size of the list and return an
+int, return the following error codes on error:
+<DL COMPACT><DT><DD>
+<DL COMPACT>
+<DT><B>STD_MEM_FAILURE</B>
+
+<DD>
+a memory allocation failure occurred.
+</DL></DL>
+
+<P>
+<H2>NOTES</H2>
+
+<P>
+For performance reasons, by default the stdutil library does no usage
+checking. It assumes the programmer knows what s/he is doing and
+doesn't want additional overhead incurred from sanity checks.
+<P>
+However, the library can be built will several types of checks,
+including bounds and initialization checks that can catch many common
+programming mistakes. See the README file included with the stdutil
+library distribution to see how to create such a &quot;checked&quot; or debug
+library.
+<P>
+<H2>AUTHOR</H2>
+
+<P>
+John Schultz &lt;<A HREF="mailto:jschultz@cnds.jhu.edu">jschultz@cnds.jhu.edu</A>&gt;
+<P>
+<H2>SEE ALSO</H2>
+
+<P>
+std_it, stdarr, stdcarr
+
+<!--#include virtual="/includes/footer" -->
+
+</BODY>
+</HTML>

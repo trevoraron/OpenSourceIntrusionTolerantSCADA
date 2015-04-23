@@ -1,0 +1,199 @@
+.TH STD_IT 3 "NOV 2000" "Stdutil Library" 
+
+.SH "NAME"
+
+std_it, std_it_val, std_it_equals, std_it_is_begin, std_it_is_end, std_it_seek_begin, std_it_seek_end, std_it_next, std_it_advance, std_it_prev, std_it_retreat, std_it_offset, std_it_compare \- basic operations provided by stdutil iterators.
+
+.SH "SYNOPSIS"
+
+.BI "void *std_it_val(const std_it *" it ");"
+
+.BI "stdbool std_it_equals(const std_it *" it1 ", const std_it *" it2 ");"
+
+.BI "stdbool std_it_is_begin(const std_it *" it ");"
+
+.BI "stdbool std_it_is_end(const std_it *" it ");"
+
+.BI "std_it *std_it_seek_begin(std_it *" it ");"
+
+.BI "std_it *std_it_seek_end(std_it *" it ");"
+
+.BI "std_it *std_it_next(std_it *" it ");"
+
+.BI "std_it *std_it_advance(std_it *" it ", size_t " num_advance ");"
+
+.BI "std_it *std_it_prev(std_it *" it ");"
+
+.BI "std_it *std_it_retreat(std_it *" it ", size_t " num_retreat ");"
+
+.BI "std_it *std_it_offset(std_it *" it ", stdssize_t " offset ");"
+
+.BI "stdssize_t std_it_compare(const std_it *" it1 ", const std_it *" it2 ");"
+
+.SH "DESCRIPTION"
+
+A std_it is an abstract type that describes several iterator types
+defined by the stdutil library (e.g. - stdarr_it, stdcarr_it,
+stddll_it and stdhash_it). An iterator is a common design pattern used
+to represent a sequence of values contained in a data structure. The
+main purpose of an iterator is to allow for unique iteration through
+all of the values contained within a data structure. However,
+iterators can also be used in many other operations as well.
+
+Any data structure that supports unique iteration through all of its
+values defines a sequence on those values at the time of iteration. If
+the structure S contains n values, then each contained value in S can
+be uniquely associated with an integer rank in the range [0, n), which
+is equal to the number of values in S that precede it in the
+sequence. 
+
+For the stdutil library, multiple iterations on the same data
+structure instance that occur without intervening structural
+operations on that instance see the same rank sequence of values.
+Furthermore, many stdutil data structures define precise semantics on
+how iterators and the rank sequence of the structure are affected by
+structural changes (see each structure's documentation).
+
+The stdutil is modeled loosely after C++'s STL library, which uses
+iterators extensively. In both the stdutil and STL libraries there are
+three types of iterators: forward, bi-directional and random-access
+iterators. See each stdutil data structure's documentation for what
+type of iterator it provides.
+
+A forward iterator allows some basic operations and tests, but in
+general only allows the iterator to move forward (increasing rank) in
+the data structure's sequence. A simple singly linked list should only
+provide a forward iterator, for example. A bi-directional iterator is
+a forward iterator, but also allows the iterator to move backwards
+(decreasing rank) in the structure's sequence. A simple doubly-linked
+list should provide a bi-directional iterator, for example. A
+random-access iterator is a bi-directional iterator that allows for
+arbitrary offset and comparison of sequence ranks. A tightly packed
+array of values should provide a random-access iterator, for example.
+
+A data structure's iterator implementation should attempt to support
+the broadest class it can, while maintaing expected O(1) space and
+time overhead for each of its basic operations (next, previous and
+offset, respectively).
+
+In the stdutil library, an iterator must be correctly initialized by a
+data structure instance before it can legally be used. All operations
+on that iterator are then done in the context of the initializing
+instance. The results of using an iterator initialized by one instance
+with another instance are undefined. Likewise, the results of calling
+iterator functions (such as
+.BR "std_it_compare" )
+on iterators initialized by different structure instances are
+undefined.
+
+.SH "FORWARD ITERATORS"
+
+A forward iterator is the most restricted class of iterator and
+supports the following operations in expected O(1) space and time.
+
+.B "std_it_val"
+returns a pointer to the value to which this iterator is currently
+referencing.
+
+.B "std_it_equals"
+returns stdtrue if the two iterators are referencing the same value.
+
+.B "std_it_is_begin"
+returns stdtrue if the iterator is referencing the beginning of the
+sequence. The beginning of a sequence is defined as the first value in
+the sequence or the end of the sequence if it is empty.
+
+.B "std_it_is_end"
+returns stdtrue if the iterator is referencing the end of the
+sequence. The end of a sequence is defined as one position past the
+last value contained in the sequence (rank n). It is illegal to call
+.B "std_it_val"
+on the end of sequence.
+
+.B "std_it_seek_begin"
+sets the iterator to reference the beginning of the sequence.
+
+.B "std_it_seek_end"
+sets the iterator to reference the end of the sequence.
+
+.B "std_it_next"
+advances the iterator forward one position in the sequence.
+
+.B "std_it_advance"
+advances the iterator forward
+.I "num_advance"
+positions in the sequence. This operation should execute in O(1) space
+and 
+.RI "O(" "num_advance" ")" 
+time.
+
+.SH "BI-DIRECTIONAL ITERATORS"
+
+A bi-directional iterator is a forward iterator that also supports the
+following operations in expected O(1) space and time.
+
+.B "std_it_prev"
+retreats the iterator back one position in the sequence.
+
+.B "std_it_retreat"
+retreats the iterator back
+.I "num_retreat"
+positions in the sequence. This operation should execute in O(1) space
+and 
+.RI "O(" "num_retreat" ")" 
+time.
+
+.SH "RANDOM-ACCESS ITERATORS"
+
+A random-access iterator is a bi-directional iterator that supports
+the following operations in expected O(1) space and time.
+
+.B "std_it_offset"
+offsets the iterator 
+.I "offset"
+positions forward in the sequence. If 
+.I "offset"
+is negative, then it retreats the iterator that many positions.
+
+.B "std_it_compare"
+compares two iterators and returns the offset in sequence rank needed
+to move from
+.I "it2"
+to
+.IR "it1" .
+For example, say
+.I "it1"
+is referencing the value with rank 2 and 
+.I "it2"
+is referencing the value with rank 5, then 
+.B std_it_compare
+.RI "(" "it1" ", " "it2" ")"
+would return -3.
+
+.SH "RETURN VALUES"
+
+When called legally, none of the above functions can fail. Most of the
+functions' return values are described in the SYNOPSIS. The functions
+that return std_it *'s return the
+.I "it"
+passed to them to allow for function composition.
+
+.SH "NOTES"
+
+For performance reasons, by default the stdutil library does no usage
+checking. It assumes the programmer knows what s/he is doing and
+doesn't want additional overhead incurred from sanity checks.
+
+However, the library can be built will several types of checks,
+including bounds and initialization checks that can catch many common
+programming mistakes. See the README file included with the stdutil
+library distribution to see how to create such a "checked" or debug
+library.
+
+.SH "AUTHOR"
+
+John Schultz <jschultz@cnds.jhu.edu>
+
+.SH "SEE ALSO"
+
+stdarr, stdcarr, stddll, stdhash
