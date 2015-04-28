@@ -1,0 +1,497 @@
+<HTML><HEAD><TITLE>Manpage of FL_version</TITLE>
+</HEAD>
+
+<body bgcolor="#FFFFFF">
+
+<!--#include virtual="/includes/header-a" -->
+
+<a href="http://www.cnds.jhu.edu/software/stdutil">
+<img src="stdutil_title.gif" alt="Stdutil Library" border=0>
+</a>
+
+<!--#include virtual="/includes/header-b" -->
+
+<H1>STDHASH</H1>
+Section: User Manuals (3)<BR>Updated: NOV 2000<BR>
+<HR>
+
+<P>
+<H2>NAME</H2>
+
+<P>
+stdhash, stdhash_construct, stdhash_construct2, stdhash_copy_construct, stdhash_destruct, stdhash_size, stdhash_empty, stdhash_find, stdhash_insert, stdhash_erase, stdhash_erase_key, stdhash_clear, stdhash_reserve, stdhash_rehash, stdhash_begin, stdhash_end, stdhash_last, stdhash_get, stdhash_max_size, stdhash_key_size, stdhash_val_size, stdhash_key_val_size, stdhash_it_key, stdhash_it_val, stdhash_it_kvp, stdhash_it_keyed_next - operations on a stdhash, a dictionary data structure
+<P>
+<H2>SYNOPSIS</H2>
+
+<P>
+<B>#include &lt;stdutil/stdhash.h&gt;</B>
+
+<P>
+<B>stdhash </B><I>h</I><B> = STDHASH_STATIC_CONSTRUCT(</B><I>sizeof_key</I><B>, </B><I>sizeof_val</I><B>, </B><I>kequals</I><B>, </B><I>khcode</I><B>);</B>
+
+<P>
+<B>stdhash </B><I>h</I><B> = STDHASH_STATIC_CONSTRUCT2(</B><I>sizeof_key</I><B>, </B><I>sizeof_val</I><B>, </B><I>kequals</I><B>, </B><I>khcode</I><B>, </B><I>dseed</I><B>);</B>
+
+<P>
+<B>int stdhash_construct(stdhash *</B><I>h</I><B>, size_t </B><I>sizeof_key</I><B>, size_t </B><I>sizeof_val</I><B>, stdequals_fcn </B><I>kequals</I><B>, stdhcode_fcn </B><I>khcode</I><B>);</B>
+
+<P>
+<B>int stdhash_construct2(stdhash *</B><I>h</I><B>, size_t </B><I>sizeof_key</I><B>, size_t </B><I>sizeof_val</I><B>, stdequals_fcn </B><I>kequals</I><B>, stdhcode_fcn </B><I>khcode</I><B>, size_t </B><I>dseed</I><B>);</B>
+
+<P>
+<B>int stdhash_copy_construct(stdhash *</B><I>dst</I><B>, const stdhash *</B><I>src</I><B>);</B>
+
+<P>
+<B>void stdhash_destruct(stdhash *</B><I>h</I><B>);</B>
+
+<P>
+<B>size_t stdhash_size(const stdhash *</B><I>h</I><B>);</B>
+
+<P>
+<B>stdbool stdhash_empty(const stdhash *</B><I>h</I><B>);</B>
+
+<P>
+<B>stdhash_it *stdhash_find(const stdhash *</B><I>h</I><B>, stdhash_it *</B><I>it</I><B>, const void *</B><I>key</I><B>);</B>
+
+<P>
+<B>stdhash_it *stdhash_insert(stdhash *</B><I>h</I><B>, stdhash_it *</B><I>it</I><B>, const void *</B><I>key</I><B>, const void *</B><I>val</I><B>);</B>
+
+<P>
+<B>stdhash_it *stdhash_erase(stdhash_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>int stdhash_erase_key(stdhash *</B><I>h</I><B>, const void *</B><I>key</I><B>);</B>
+
+<P>
+<B>int stdhash_clear(stdhash *</B><I>h</I><B>);</B>
+
+<P>
+<B>int stdhash_reserve(stdhash *</B><I>h</I><B>, size_t </B><I>num_elems</I><B>);</B>
+
+<P>
+<B>int stdhash_rehash(stdhash *</B><I>h</I><B>);</B>
+
+<P>
+<B>stdhash_it *stdhash_begin(const stdhash *</B><I>h</I><B>, stdhash_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>stdhash_it *stdhash_end(const stdhash *</B><I>h</I><B>, stdhash_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>stdhash_it *stdhash_last(const stdhash *</B><I>h</I><B>, stdhash_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>stdhash_it *stdhash_get(const stdhash *</B><I>h</I><B>, stdhash_it *</B><I>it</I><B>, size_t </B><I>elem_num</I><B>);</B>
+
+<P>
+<B>void *stdhash_it_key(const stdhash_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>void *stdhash_it_val(const stdhash_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>stdkvp *stdhash_it_kvp(const stdhash_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>stdhash_it *stdhash_it_keyed_next(stdhash_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>size_t stdhash_max_size(const stdhash *</B><I>h</I><B>);</B>
+
+<P>
+<B>size_t stdhash_key_size(const stdhash *</B><I>h</I><B>);</B>
+
+<P>
+<B>size_t stdhash_val_size(const stdhash *</B><I>h</I><B>);</B>
+
+<P>
+<B>size_t stdhash_key_val_size(const stdhash *</B><I>h</I><B>);</B>
+
+<P>
+<H2>DESCRIPTION</H2>
+
+<P>
+stdhash is a generic data structure that contains, by value, a
+collection of same-sized key-val pairs, where the keys remain constant
+while in the stdhash. These pairs can be referenced in expected
+constant O(1) time, worst case linear O(n) time (where n is the number
+of pairs in the hash), by their non-unique keys. This data structure
+is the equivalent of a dynamic, non-unique key dictionary or multihash
+in other languages. One can construct a stdhash to only contain key
+types. In that case, the stdhash acts as a collection of non-unique
+keys. This can be useful to test for key existence (e.g. - does the
+hash contain 5?). This structure is well suited to applications where
+quick look-ups based on a key often occur and long structural updates
+can be occasionaly tolerated.
+<P>
+Before a stdhash can legally be used it must be successfully
+initialized. The user must specify the size of the key and value types
+to be stored. Values can be zero bytes in size. In addition, the user
+can specify two functions that will be used to compare keys. The first
+function is an equality tester for keys: it invariantly returns
+stdtrue (1) if the keys are equal and stdfalse (0) if the keys are not
+equal -- it should be a reflexive, symmetric and transitive relation
+on keys. The second function is a hashcode function that takes a
+pointer to a key and invariantly returns a size_t that represents the
+key as a size_t. This hashcode fcn must be consistent with the
+equality function, meaning that if two keys are equal then they must
+have the same hashcode. It is legal for two unequal keys to return the
+same hashcode, however, such hashcode collisions should occur with a
+probability of approximately 1 / (2^(sizeof(size_t) * 8)) for optimal
+performance.
+<P>
+If the key type being stored is appropriate, the user can specify
+null (0) for either, or both, of the key comparison functions. In this
+case, a bitwise memory comparison is done for key equality and the
+hashcodes are computed as a function of the bits of the constant key.
+<P>
+In addition, upon initialization a stdhash is given a seed number that
+it uses to generate random numbers. Two stdhashs that start with the
+same seeds and are modified in the exact same manner will be
+synchronized in terms of the key-val pairs and the sequence of those
+pairs that they contain.
+<P>
+<B>STDHASH_STATIC_CONSTRUCT</B>
+
+is a macro that initializes the assigned stdhash at definition to
+contain key-val pairs with keys of size
+<I>sizeof_key</I>
+
+bytes and values of 
+<I>sizeof_val</I>
+
+bytes. The keys will be compared for equality using the function 
+<I>kequals</I>
+
+and key hashcodes will be computed using the function 
+<I>khcode</I>.
+
+stdhashs constructed this way will be initialized with the same
+constant seed.
+<B>STDHASH_STATIC_CONSTRUCT2</B>
+
+is the same as 
+<B>STDHASH_STATIC_CONSTRUCT</B>
+
+except that the caller may specify a different seed with which to
+initialize the stdhash instead of the default seed.
+<B>stdhash_construct</B>
+
+dynamically initializes the stdhash object pointed to by
+<I>h</I>
+
+to contain key-val pairs with keys of size
+<I>sizeof_key</I>
+
+bytes and values of
+<I>sizeof_val</I>
+
+bytes. The keys will be compared for equality using the function
+<I>kequals</I>
+
+and key hashcodes will be computed using the function
+<I>khcode</I>.
+
+stdhashs constructed this way will be initialized with a seed that is
+based on the current time on the system.
+<B>stdhash_construct2</B>
+
+works the same way as
+<B>stdhash_construct</B>
+
+except that the seed,
+is explicitly given by the caller as
+<I>dseed</I>.
+
+stdhashs initialized using any of these methods initially contain no
+key-val pairs.
+<B>stdhash_copy_construct</B>
+
+makes 
+<I>dst</I>
+
+contain a clone (copy by value) of the sequence of key-val pairs that
+the successfully initialized
+<I>src</I>
+
+stdhash contains. The cloned stdhash has the same operational parameters
+(i.e. - sizeof_key, sizeof_val, key_equals, key_hcode, rand_seed) as
+the source stdhash. It is illegal to call a constructor on an already
+successfully constructed stdhash -- doing so will cause memory leaks
+at best. When a stdhash is no longer in use its memory should be
+released by calling
+<B>stdhash_destruct</B>
+
+on it. Once a stdhash has been destructed it must be initialized again
+before being legally reused.
+<P>
+<B>stdhash_size</B>
+
+indicates the current number of key-vals contained in the stdhash.
+<B>stdhash_empty</B>
+
+indicates whether or not the stdhash contains no key-vals.
+<P>
+stdhash stores its values in a contiguous slab of memory. Due to
+this scheme, stdhash supports expected O(1) find, insert and erase
+operations of key-vals. However, insert and erase operations that
+require reallocation of the table will run in O(n) time and,
+technically, with vanishingly small probability, find operations can
+run in O(n) time.
+<B>stdhash_find</B>
+
+finds the first instance of the key
+<I>key</I>
+
+in the table and points the iterator 
+<I>it</I>
+
+at that key-val pair.
+<B>stdhash_insert</B>
+
+inserts the key-val pair (
+<I>key</I>,
+
+<I>value</I>)
+
+into the table and points 
+<I>it</I>
+
+at the newly inserted pair. Note, that this insertion 
+<B>DOES NOT </B>
+
+overwrite any other pairs with an equal key. In addtion, the caller
+can pass a null (0) pointer for
+<I>it</I>.
+
+However, if the caller does this, there will be no way to detect
+if the insertion fails, so this is not recommended.
+<B>stdhash_erase</B>
+
+erases the key-val pair at which 
+<I>it</I>
+
+is pointing. After the erasure
+<I>it</I>
+
+is pointed at the beginning of the stdhash.
+<B>stdhash_erase_key</B>
+
+erases all key-val pairs that have a key equal to
+<I>key</I>.
+
+It returns the number of key-val pairs that were erased.
+<P>
+<B>stdhash_clear</B>
+
+erases all of the key-val pairs contained in the stdhash.
+<B>stdhash_reserve</B>
+
+reserves enough memory to contain
+<I>num_elems</I>
+
+key-val pairs without requiring a reallocation.
+<B>stdhash_rehash</B>
+
+can be called to reallocate the table to its most appropriate size and
+to potentially increase the performance of the table.
+<P>
+stdhash is mainly used as a lookup table. However, it also contains
+a sequence of values. At any particular point between structural
+operations, each of the key-val pairs can be assigned a rank [0, n)
+just like the sequence stdutil data structures. However, unlike the
+sequence data structures this sequence appears random in nature and
+can change in a drastic and apparently random fashion upon structural
+changes. Like the other stdutil data structures, stdhash has several
+methods for getting iterators that reference particular values in its
+sequence. stdhash provides bi-directional iterators (see std_it).
+<B>stdhash_begin</B>
+
+sets the iterator 
+<I>it</I>
+
+to reference the first, or 0th, value of the stdhash, or, if the
+stdhash is empty to reference the end of the stdhash. The end of the
+stdhash is one past the last value it contains.
+<B>stdhash_end</B>
+
+sets the iterator to reference the end of the stdhash. 
+<B>stdhash_last</B>
+
+sets the iterator to reference the last value in the sequence. It is
+illegal to call stdhash_last on an empty stdhash. The above three
+iterator functions operate in constant O(1) time.
+<B>stdhash_get</B>
+
+sets the iterator to reference the value with index
+<I>elem_num</I>
+
+or end if 
+<I>elem_num</I>
+
+is n.
+<I>elem_num</I>
+
+must be less than or equal to n. This operation runs in O(n) time and
+is provided only as a convenience. If the application often references
+arbitrary positions in the sequence, then another structure (such as
+stdarr or stdcarr) should probably be considered. All of these
+functions return pointers to the passed iterator to allow function
+composition.
+<P>
+stdhash iterators provide functionality that is slightly different
+and beyond the ``normal'' iterator functions (see std_it).
+<B>stdhash_it_key</B>
+
+returns a pointer to the key of the key-val pair to which
+<I>it</I>
+
+is referencing.
+<B>stdhash_it_val</B>
+
+returns a pointer to the value of the key-val pair to which
+<I>it</I>
+
+is referencing. Note, that it 
+<B>DOES NOT</B>
+
+provide a pointer to the whole key-val pair as you might expect.
+<B>stdhash_it_kvp</B>
+
+returns a pointer to the struct stdkvp (see stdutil/stdkvp.h) that
+contains the entire key-val pair to which
+<I>it</I>
+
+is referencing.
+<B>stdhash_it_keyed_next</B>
+
+moves the iterator to reference the next key-val pair that has a key
+equal to the key to which
+<I>it</I>
+
+is currently referencing. If no such key-val pair exists then
+<I>it</I>
+
+will reference the end of the stdhash. This function allows you, for a
+given key, to iterate through all the duplicate keys in the
+stdhash. For example, let's say you had a stdhash that used ints as
+its key type and C strings as its values. Let's say you then inserted
+the key-val pairs: (5, &quot;Hello&quot;) (5, &quot;World&quot;), (5, &quot;!&quot;). Then if you
+did a
+<B>stdhash_find</B>
+
+for 5, it would return an iterator to whichever of the 3 key-val pairs
+was ``first'', as defined by the stdhash (this is invariant between
+structural changes) and the key. Then if you did
+<B>stdhash_it_keyed_next</B>
+
+on that iterator it would move the iterator to reference the
+``second'' of those pairs as defined by the stdhash and the key
+(invariant between structural changes). If you did it one more time,
+then
+<B>stdhash_it_keyed_next</B>
+
+would move the iterator to reference the ``last'' of those pairs as
+defined by the stdhash and the key. If you called it one more time it
+would advance the iterator to point at the end of the stdhash. Also,
+if you got an iterator to the ``last'' key-val pair through some other
+method (e.g. - 
+<B>stdhash_get</B>)
+
+and then called 
+<B>stdhash_it_keyed_next</B>
+
+it would move the iterator to reference the end of the
+stdhash. Duplicate keys define a sort of mini-sequence of themselves
+within the stdhash. This sequence currently can only be iterated
+through
+<B>stdhash_it_keyed_next</B>.
+
+<P>
+<B>stdhash_max_size</B>
+
+returns the absolute maximum number of key-val pairs stdhash can hold
+and is invariant across different stdhashs.
+<B>stdhash_key_size</B>
+
+returns the size, in bytes, of the key type this stdhash is currently
+containing.
+<B>stdhash_val_size</B>
+
+returns the size, in bytes, of the value type this stdhash is
+currently containing.
+<B>stdhash_key_val_size</B>
+
+returns the size, in bytes, of the key-value type struct stdkvp (see
+stdkvp.h) that contains the key-val pair.
+<P>
+<H2>RETURN VALUES</H2>
+
+<P>
+Most of the functions' return values are described in the SYNOPSIS and
+cannot fail. However, the constructors and functions that potentially
+affect the size of the stdhash can fail. If such a function returns an
+int, then it returns zero on success and non-zero on failure (except
+for
+<B>stdhash_erase_key</B>).
+
+If such a function returns a stdhash_it *, then it returns non-zero
+on success and null(0) on failure. Whenever any stdhash function fails
+it has no side effects.
+<P>
+<H2>ERRORS</H2>
+
+<P>
+The constructor functions can return the following error codes:
+<DL COMPACT><DT><DD>
+<DL COMPACT>
+<DT><B>STD_ILLEGAL_PARAM </B>
+
+<DD>
+the sizeof the key type was zero.
+<P>
+<DT><B>STD_MEM_FAILURE</B>
+
+<DD>
+a memory allocation failure occurred.
+</DL></DL>
+
+<P>
+Functions that potentially affect the size of the stdhash and return
+an int, return the following error codes on error:
+<DL COMPACT><DT><DD>
+<DL COMPACT>
+<DT><B>STD_MEM_FAILURE</B>
+
+<DD>
+a memory allocation failure occurred.
+</DL></DL>
+
+<P>
+<H2>NOTES</H2>
+
+<P>
+For performance reasons, by default the stdutil library does no usage
+checking. It assumes the programmer knows what s/he is doing and
+doesn't want additional overhead incurred from sanity checks.
+<P>
+However, the library can be built will several types of checks,
+including bounds and initialization checks that can catch many common
+programming mistakes. See the README file included with the stdutil
+library distribution to see how to create such a &quot;checked&quot; or debug
+library.
+<P>
+<H2>AUTHOR</H2>
+
+<P>
+John Schultz &lt;<A HREF="mailto:jschultz@cnds.jhu.edu">jschultz@cnds.jhu.edu</A>&gt;
+<P>
+<H2>SEE ALSO</H2>
+
+<P>
+std_it
+
+<!--#include virtual="/includes/footer" -->
+
+</BODY>
+</HTML>

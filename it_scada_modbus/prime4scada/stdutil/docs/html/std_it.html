@@ -1,0 +1,268 @@
+<HTML><HEAD><TITLE>Manpage of FL_version</TITLE>
+</HEAD>
+
+<body bgcolor="#FFFFFF">
+
+<!--#include virtual="/includes/header-a" -->
+
+<a href="http://www.cnds.jhu.edu/software/stdutil">
+<img src="stdutil_title.gif" alt="Stdutil Library" border=0>
+</a>
+
+<!--#include virtual="/includes/header-b" -->
+
+<H1>STD_IT</H1>
+Section: User Manuals (3)<BR>Updated: NOV 2000<BR>
+<HR>
+
+<H2>NAME</H2>
+
+<P>
+std_it, std_it_val, std_it_equals, std_it_is_begin, std_it_is_end, std_it_seek_begin, std_it_seek_end, std_it_next, std_it_advance, std_it_prev, std_it_retreat, std_it_offset, std_it_compare - basic operations provided by stdutil iterators.
+<P>
+<H2>SYNOPSIS</H2>
+
+<P>
+<B>void *std_it_val(const std_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>stdbool std_it_equals(const std_it *</B><I>it1</I><B>, const std_it *</B><I>it2</I><B>);</B>
+
+<P>
+<B>stdbool std_it_is_begin(const std_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>stdbool std_it_is_end(const std_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>std_it *std_it_seek_begin(std_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>std_it *std_it_seek_end(std_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>std_it *std_it_next(std_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>std_it *std_it_advance(std_it *</B><I>it</I><B>, size_t </B><I>num_advance</I><B>);</B>
+
+<P>
+<B>std_it *std_it_prev(std_it *</B><I>it</I><B>);</B>
+
+<P>
+<B>std_it *std_it_retreat(std_it *</B><I>it</I><B>, size_t </B><I>num_retreat</I><B>);</B>
+
+<P>
+<B>std_it *std_it_offset(std_it *</B><I>it</I><B>, stdssize_t </B><I>offset</I><B>);</B>
+
+<P>
+<B>stdssize_t std_it_compare(const std_it *</B><I>it1</I><B>, const std_it *</B><I>it2</I><B>);</B>
+
+<P>
+<H2>DESCRIPTION</H2>
+
+<P>
+A std_it is an abstract type that describes several iterator types
+defined by the stdutil library (e.g. - stdarr_it, stdcarr_it,
+stddll_it and stdhash_it). An iterator is a common design pattern used
+to represent a sequence of values contained in a data structure. The
+main purpose of an iterator is to allow for unique iteration through
+all of the values contained within a data structure. However,
+iterators can also be used in many other operations as well.
+<P>
+Any data structure that supports unique iteration through all of its
+values defines a sequence on those values at the time of iteration. If
+the structure S contains n values, then each contained value in S can
+be uniquely associated with an integer rank in the range [0, n), which
+is equal to the number of values in S that precede it in the
+sequence. 
+<P>
+For the stdutil library, multiple iterations on the same data
+structure instance that occur without intervening structural
+operations on that instance see the same rank sequence of values.
+Furthermore, many stdutil data structures define precise semantics on
+how iterators and the rank sequence of the structure are affected by
+structural changes (see each structure's documentation).
+<P>
+The stdutil is modeled loosely after C++'s STL library, which uses
+iterators extensively. In both the stdutil and STL libraries there are
+three types of iterators: forward, bi-directional and random-access
+iterators. See each stdutil data structure's documentation for what
+type of iterator it provides.
+<P>
+A forward iterator allows some basic operations and tests, but in
+general only allows the iterator to move forward (increasing rank) in
+the data structure's sequence. A simple singly linked list should only
+provide a forward iterator, for example. A bi-directional iterator is
+a forward iterator, but also allows the iterator to move backwards
+(decreasing rank) in the structure's sequence. A simple doubly-linked
+list should provide a bi-directional iterator, for example. A
+random-access iterator is a bi-directional iterator that allows for
+arbitrary offset and comparison of sequence ranks. A tightly packed
+array of values should provide a random-access iterator, for example.
+<P>
+A data structure's iterator implementation should attempt to support
+the broadest class it can, while maintaing expected O(1) space and
+time overhead for each of its basic operations (next, previous and
+offset, respectively).
+<P>
+In the stdutil library, an iterator must be correctly initialized by a
+data structure instance before it can legally be used. All operations
+on that iterator are then done in the context of the initializing
+instance. The results of using an iterator initialized by one instance
+with another instance are undefined. Likewise, the results of calling
+iterator functions (such as
+<B>std_it_compare</B>)
+
+on iterators initialized by different structure instances are
+undefined.
+<P>
+<H2>FORWARD ITERATORS</H2>
+
+<P>
+A forward iterator is the most restricted class of iterator and
+supports the following operations in expected O(1) space and time.
+<P>
+<B>std_it_val</B>
+
+returns a pointer to the value to which this iterator is currently
+referencing.
+<P>
+<B>std_it_equals</B>
+
+returns stdtrue if the two iterators are referencing the same value.
+<P>
+<B>std_it_is_begin</B>
+
+returns stdtrue if the iterator is referencing the beginning of the
+sequence. The beginning of a sequence is defined as the first value in
+the sequence or the end of the sequence if it is empty.
+<P>
+<B>std_it_is_end</B>
+
+returns stdtrue if the iterator is referencing the end of the
+sequence. The end of a sequence is defined as one position past the
+last value contained in the sequence (rank n). It is illegal to call
+<B>std_it_val</B>
+
+on the end of sequence.
+<P>
+<B>std_it_seek_begin</B>
+
+sets the iterator to reference the beginning of the sequence.
+<P>
+<B>std_it_seek_end</B>
+
+sets the iterator to reference the end of the sequence.
+<P>
+<B>std_it_next</B>
+
+advances the iterator forward one position in the sequence.
+<P>
+<B>std_it_advance</B>
+
+advances the iterator forward
+<I>num_advance</I>
+
+positions in the sequence. This operation should execute in O(1) space
+and 
+O(<I>num_advance</I>)
+
+time.
+<P>
+<H2>BI-DIRECTIONAL ITERATORS</H2>
+
+<P>
+A bi-directional iterator is a forward iterator that also supports the
+following operations in expected O(1) space and time.
+<P>
+<B>std_it_prev</B>
+
+retreats the iterator back one position in the sequence.
+<P>
+<B>std_it_retreat</B>
+
+retreats the iterator back
+<I>num_retreat</I>
+
+positions in the sequence. This operation should execute in O(1) space
+and 
+O(<I>num_retreat</I>)
+
+time.
+<P>
+<H2>RANDOM-ACCESS ITERATORS</H2>
+
+<P>
+A random-access iterator is a bi-directional iterator that supports
+the following operations in expected O(1) space and time.
+<P>
+<B>std_it_offset</B>
+
+offsets the iterator 
+<I>offset</I>
+
+positions forward in the sequence. If 
+<I>offset</I>
+
+is negative, then it retreats the iterator that many positions.
+<P>
+<B>std_it_compare</B>
+
+compares two iterators and returns the offset in sequence rank needed
+to move from
+<I>it2</I>
+
+to
+<I>it1</I>.
+
+For example, say
+<I>it1</I>
+
+is referencing the value with rank 2 and 
+<I>it2</I>
+
+is referencing the value with rank 5, then 
+<B>std_it_compare</B>
+
+(<I>it1</I>, <I>it2</I>)
+
+would return -3.
+<P>
+<H2>RETURN VALUES</H2>
+
+<P>
+When called legally, none of the above functions can fail. Most of the
+functions' return values are described in the SYNOPSIS. The functions
+that return std_it *'s return the
+<I>it</I>
+
+passed to them to allow for function composition.
+<P>
+<H2>NOTES</H2>
+
+<P>
+For performance reasons, by default the stdutil library does no usage
+checking. It assumes the programmer knows what s/he is doing and
+doesn't want additional overhead incurred from sanity checks.
+<P>
+However, the library can be built will several types of checks,
+including bounds and initialization checks that can catch many common
+programming mistakes. See the README file included with the stdutil
+library distribution to see how to create such a &quot;checked&quot; or debug
+library.
+<P>
+<H2>AUTHOR</H2>
+
+<P>
+John Schultz &lt;<A HREF="mailto:jschultz@cnds.jhu.edu">jschultz@cnds.jhu.edu</A>&gt;
+<P>
+<H2>SEE ALSO</H2>
+
+<P>
+stdarr, stdcarr, stddll, stdhash
+
+<!--#include virtual="/includes/footer" -->
+
+</BODY>
+</HTML>

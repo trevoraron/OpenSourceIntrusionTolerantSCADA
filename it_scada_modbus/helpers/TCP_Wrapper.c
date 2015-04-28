@@ -1,0 +1,147 @@
+/*
+ * TCP_Wrapper.c contains the implementation of the 
+ *  methods used to read from/write to TCP sockets.
+ *
+ * Creator: Marco
+ * Created: 3/30/2015
+ * Last modified: 4/26/2015
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
+// Server-side socket creation
+int passiveTCPsock(int port, int qlen) {
+  int s;
+  struct sockaddr_in conn;
+
+  // Create socket
+  s = socket(PF_INET, SOCK_STREAM, 0);
+  if(s < 0) {
+    perror("Couldn't create a socket");
+    exit(EXIT_FAILURE);
+  }
+
+  // Bind
+  conn.sin_family = AF_INET;
+  conn.sin_port = htons(port);
+  conn.sin_addr.s_addr = htonl(INADDR_ANY);
+  if(bind(s, (struct sockaddr *)&conn, sizeof(conn)) < 0) {
+    perror("Bind failure");
+    exit(EXIT_FAILURE);
+  }
+
+  // Listen
+  if(listen(s, qlen) < 0) {
+    perror("Listen error");
+    exit(EXIT_FAILURE);
+  }
+
+  return s;
+}
+
+// Client-side socket creation
+int activeTCPsock(char *addr, int port) {
+  int s;
+  struct sockaddr_in conn;
+
+  // Create socket
+  s = socket(PF_INET, SOCK_STREAM, 0);
+  if(s < 0) {
+    perror("Couldn't create a socket");
+    exit(EXIT_FAILURE);
+  }
+
+  bzero(&conn, sizeof(conn));
+  conn.sin_family = AF_INET;
+  conn.sin_port = htons(port);
+  conn.sin_addr.s_addr = inet_addr(addr);
+
+  // Connect to the server
+  if(connect(s, (struct sockaddr *)&conn, sizeof(conn)) < 0) {
+    perror("Connection error");
+    exit(EXIT_FAILURE);
+  }
+
+  return s;
+}
+
+int TCP_Read(int s, void *dummy_buf, int nBytes) {
+  int ret, nRead, nRemaining;
+  char *buf = NULL;
+
+  nRemaining = nBytes;
+  nRead = 0;
+
+  buf = (char *)dummy_buf;
+
+  while(1) {
+    ret = read(s, &buf[nRead], nRemaining);
+
+    if(ret < 0) {
+      perror("TCP read failure");
+      exit(EXIT_FAILURE);
+      break;
+    }
+      
+    if(ret == 0)
+      break;
+
+    if(ret != nBytes)
+      printf("Short read in loop: %d out of %d\n", ret, nBytes);
+
+    nRead += ret;
+    nRemaining -= ret;
+
+    if(nRead == nBytes)
+      break;
+  }
+
+  if(nRead != nBytes)
+    printf("Short read: %d %d\n", nRead, nBytes);
+
+  return ret;
+}
+
+int TCP_Write(int s, void *dummy_buf, int nBytes) {
+  int ret, nWritten, nRemaining;
+  char *buf = NULL;
+  
+  buf = (char *)dummy_buf;
+  nWritten = 0;
+  nRemaining = nBytes;
+
+  while(1) {
+    ret = write(s, &buf[nWritten], nRemaining);
+  
+    if(ret < 0) {
+      perror("TCP write failure");
+      exit(EXIT_FAILURE);
+      break;
+    }
+
+    if(ret == 0)
+      break;
+
+    if(ret != nBytes)
+      printf("Short write in loop: %d out of %d\n", ret, nBytes);
+
+    nWritten += ret;
+    nRemaining -= ret;
+    
+    if(nWritten == nBytes)
+      break;
+  }
+
+  if(nWritten != nBytes)
+    printf("Short write: %d %d\n", nWritten, nBytes);
+
+  return ret;
+}

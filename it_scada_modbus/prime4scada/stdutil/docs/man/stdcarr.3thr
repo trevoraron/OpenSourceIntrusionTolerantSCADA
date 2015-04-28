@@ -1,0 +1,384 @@
+.TH STDCARR 3 "NOV 2000" "Stdutil Library" 
+
+.SH "NAME"
+
+stdcarr, stdcarr_construct, stdcarr_copy_construct, stdcarr_destruct, stdcarr_size, stdcarr_empty, stdcarr_high_capacity, stdcarr_low_capacity, stdcarr_get_auto_alloc, stdcarr_set_auto_alloc, stdcarr_push_front, stdcarr_pop_front, stdcarr_push_back, stdcarr_pop_back, stdcarr_multi_push_front, stdcarr_multi_pop_front, stdcarr_multi_push_back, stdcarr_multi_pop_back, stdcarr_insert, stdcarr_erase, stdcarr_repeat_insert, stdcarr_multi_insert, stdcarr_multi_erase, stdcarr_resize, stdcarr_clear, stdcarr_set_capacity, stdcarr_reserve, stdcarr_shrink_fit, stdcarr_begin, stdcarr_end, stdcarr_last, stdcarr_get, stdcarr_max_size, stdcarr_val_size \- operations on a stdcarr, a resizable circular array data structure
+
+.SH "SYNOPSIS"
+
+.B "#include <stdutil/stdcarr.h>"
+
+.BI "stdcarr " carray " = STDCARR_STATIC_CONSTRUCT(sizeof_val);"
+
+.BI "int stdcarr_construct(stdcarr *" carr ", size_t " sizeof_val ");"
+
+.BI "int stdcarr_copy_construct(stdcarr *" dst ", const stdcarr *" src ");"
+
+.BI "void stdcarr_destruct(stdcarr *" carr ");"
+
+.BI "size_t stdcarr_size(const stdcarr *" carr ");"
+
+.BI "stdbool stdcarr_empty(const stdcarr *" carr ");"
+
+.BI "size_t stdcarr_high_capacity(const stdcarr *" carr ");"
+
+.BI "size_t stdcarr_low_capacity(const stdcarr *" carr ");"
+
+.BI "stdbool stdcarr_get_auto_alloc(const stdcarr *" carr ");"
+
+.BI "void stdcarr_set_auto_alloc(stdcarr *" carr ", stdbool " use_auto_alloc ");"
+
+.BI "int stdcarr_push_front(stdcarr *" carr ", const void *" val ");"
+
+.BI "int stdcarr_pop_front(stdcarr *" carr ");"
+
+.BI "int stdcarr_push_back(stdcarr *" carr ", const void *" val ");"
+
+.BI "int stdcarr_pop_back(stdcarr *" carr ");"
+
+.BI "int stdcarr_multi_push_front(stdcarr *" carr ", const void *" vals ", size_t " num_push ");"
+
+.BI "int stdcarr_multi_pop_front(stdcarr *" carr ", size_t " num_pop ");"
+
+.BI "int stdcarr_multi_push_back(stdcarr *" carr ", const void *" vals ", size_t " num_push ");"
+
+.BI "int stdcarr_multi_pop_back(stdcarr *" carr ", size_t " num_pop ");"
+
+.BI "stdcarr_it *stdcarr_insert(stdcarr_it *" it ", const void *" val ");"
+
+.BI "stdcarr_it *stdcarr_erase(stdcarr_it *" it ");"
+
+.BI "stdcarr_it *stdcarr_repeat_insert(stdcarr_it *" it ", const void *" val ", size_t " num_times ");"
+
+.BI "stdcarr_it *stdcarr_multi_insert(stdcarr_it *" it ", const void *" vals ", size_t " num_insert ");"
+
+.BI "stdcarr_it *stdcarr_multi_erase(stdcarr_it *" it ", size_t " num_erase ");"
+
+.BI "int stdcarr_resize(stdcarr *" carr ", size_t " num_elems ");"
+
+.BI "int stdcarr_clear(stdcarr *" carr ");"
+
+.BI "int stdcarr_set_capacity(stdcarr *" carr " , size_t " num_elems ");"
+
+.BI "int stdcarr_reserve(stdcarr *" carr ", size_t " num_elems ");"
+
+.BI "int stdcarr_shrink_fit(stdcarr *" carr ");"
+
+.BI "stdcarr_it *stdcarr_begin(const stdcarr *" carr ", stdcarr_it *" it ");"
+
+.BI "stdcarr_it *stdcarr_end(const stdcarr *" carr ", stdcarr_it *" it ");"
+
+.BI "stdcarr_it *stdcarr_last(const stdcarr *" carr ", stdcarr_it *" it ");"
+
+.BI "stdcarr_it *stdcarr_get(const stdcarr *" carr ", stdcarr_it *" it ", size_t " elem_num ");"
+
+.BI "size_t stdcarr_max_size(const stdcarr *" carr ");"
+
+.BI "size_t stdcarr_val_size(const stdcarr *" carr ");"
+
+.SH "DESCRIPTION"
+
+stdcarr is a generic data structure that contains, by value, a user
+defined sequence of same sized values. The values can be referenced in
+constant O(1) time by their 0-based rank in the sequence. This data
+structure is the equivalent of a resizable circular array or circular
+vector in other languages. This structure is well suited to
+applications where references to arbitrary points in a user defined
+sequence often occur.
+
+This data structure is closely related to the stdarr. The main
+differences between these structures are: (1) most operations should
+work slightly faster on a stdarr, and (2) stdcarr provides
+expected constant O(1) time push and pop operations on both ends of
+the array, while a stdarr only provides those operations on the end
+of the array. Obviously stdcarr supports any type of queuing
+application
+.B much 
+better than stdarr.
+
+Before a stdcarr can legally be used it must be successfully
+initialized.
+.BI "STDCARR_STATIC_CONSTRUCT(" sizeof_val ")"
+is a macro that initializes the assigned stdcarr at definition to
+contain values of size
+.I "sizeof_val"
+bytes.
+.B "stdcarr_construct"
+dynamically initializes the stdcarr object pointed to by
+.I "carr"
+to contain values of size 
+.I "sizeof_val"
+bytes. Arrays initialized using either of these methods initially
+contain no values.
+.B "stdcarr_copy_construct"
+makes 
+.I "dst"
+contain a clone (copy by value) of the sequence of values that the
+successfully initialized
+.I "src"
+array contains. The cloned array has the same operational parameters
+(i.e. - sizeof_val, auto_alloc) as the source array. It is illegal to
+call a constructor on an already successfully constructed stdcarr --
+doing so will cause memory leaks at best. When an array is no longer
+in use its memory should be released by calling
+.BR "stdcarr_destruct"
+on it. Once a stdcarr has been destructed it must be successfully
+initialized again before being legally used.
+
+.B "stdcarr_size"
+indicates the current number of values contained in the array.
+.B "stdcarr_empty"
+indicates whether or not the array contains no values.
+
+In order to support constant time access to any value, stdcarr
+allocates a contiguous block of memory in which it stores its sequence
+of values. When a rank is referenced (see stdcarr_get), an offset from
+the arbitrary beginning address of the stored values is calculated
+modulo the size of the allocated memory, which gives the address of
+the value. Because of this block memory scheme, when too many values
+are inserted to fit into the allocated memory, the stdcarr must
+allocate a new block of memory to contain the sequence and move its
+sequence there.
+
+Reallocating and copying a sequence of values is an expensive linear
+O(n) time operation, where n is the number of values contained. In
+order to minimize the frequency of these operations, stdcarr defaults
+to using an auto-allocation mechanism that handles memory
+allocation. When this mechanism is active, it allocates more memory
+than the array currently needs so that every insertion and deletion
+does not result in a reallocation. If the mechanism is active, then
+.B "stdcarr_high_capacity"
+indicates the maximum number of values the array can contain before
+being reallocated and
+.B "stdcarr_low_capacity"
+indicates the minimum number of values the array can contain before
+.B "possibly"
+being reallocated. If the size of the array always remains between
+these two numbers, then the array will never be reallocated by the
+auto-allocation mechanism.
+
+Oftentimes the programmer will want to control the allocation of the
+array's memory manually. For this reason, the programmer can activate
+or deactivate the auto-allocation mechanism by passing, respectively,
+.I "stdtrue"
+or
+.I "stdfalse"
+to
+.BR "stdcarr_set_auto_alloc" .
+The programmer can query if the auto-allocation mechanism is currently
+active by calling
+.BR "stdcarr_get_auto_alloc" .
+While the auto-allocation mechanism is disabled, the current memory
+allocation of the array is fixed and no size affecting operations
+(insert, pop, resize, etc.) will result in reallocations. In this
+case, it is the user's responsibility to ensure that there is enough
+memory to contain the values stored in the array.
+.B "stdcarr_high_capacity"
+indicates the maximum number of values an array can legally contain in
+its current allocation.
+
+Because stdcarr stores its values in contiguous memory it provides
+fast stack operations (push and pop) onto both the beginning and the
+end of the sequence. Push operations run in O(m) time, where m is the
+number of elements being pushed. Pop operations run in constant O(1)
+time. If a stack operation causes an auto-reallocation it runs in
+linear O(n) time.
+.B "stdcarr_push_front"
+pushes the referenced value onto the beginning of the array.
+.B "stdcarr_pop_front"
+pops the first element off of the front of the array.
+.B "stdcarr_push_back"
+pushes the referenced value onto the end of the array.
+.B "stdcarr_pop_back"
+pops the last value off of the end of the array.
+.B "stdcarr_multi_push_front"
+prepends an array of 
+.I "num_push"
+values onto the beginning of the stdcarr.
+.B "stdcarr_multi_pop_front"
+pops the first 
+.I "num_pop"
+values off of the beginning of the array.
+.B "stdcarr_multi_push_back" 
+appends an array of 
+.I "num_push"
+values onto the end of the stdcarr.
+.B "stdcarr_multi_pop_back"
+pops the last
+.I "num_erase"
+values off of the end of the array.
+
+Because stdcarr stores its values in contiguous memory it provides
+slow list operations (insert and erase) on the sequence in worst
+case linear O(n) time. These functions are very expensive and are only
+provided as a convenience. If the user needs to do list operations
+often, then another data structure (such as stddll) should probably be
+considered.
+.B "stdcarr_insert"
+inserts the referenced value into the sequence immediately before the
+value that the iterator
+.I "it"
+references. The passed iterator is set to point at the inserted
+value. All of the old values after the insertion point have their
+rank in the sequence incremented by one.
+.B "stdcarr_multi_insert"
+inserts an array of
+.I "num_insert" 
+values into the array immediately before the value that the iterator
+.I "it" 
+references. The passed iterator is set to point at the first value of
+the inserted values. All of the old values after the insertion point
+have their rank in the sequence incremented by
+.IR "num_insert" .
+.B "stdcarr_repeat_insert"
+inserts the referenced value into the sequence
+.I "num_times"
+times immediately before the value that
+.I "it"
+references. The passed iterator is set to point at the first value of
+the inserted values. All of the old values after the insertion point
+have their rank in the sequence incremented by
+.IR "num_times" .
+
+.B "stdcarr_erase"
+erases the value that
+.I "it"
+references. All of the remaining values after the erased value have
+their rank in the sequence decremented by one. The passed iterator is
+set to point at the value that shifted into the erased position, or
+end if none.
+.B "stdcarr_multi_erase"
+erases the contiguous increasing subsequence of 
+.I "num_erase"
+values starting at and including the rank/value that
+.I "it"
+references. All of the remaining values after the erased subsequence
+have their rank in the sequence decremented by
+.IR "num_erase" .
+The passed iterator is set to point at the value that shifted into the
+beginning position of the erased subsequence, or end if none. All of
+the list operations return a pointer to the passed iterator to allow
+for function composition.
+
+Stdcarr also has several resizing and capacity (allocation) features.
+.B "stdcarr_resize"
+resizes the array to contain 
+.I "num_elems"
+values. If 
+.I "num_elems"
+is smaller than the current size of the array, then this will truncate
+the sequence to only contain the first
+.I "num_elems"
+values in the array. If 
+.I "num_elems"
+is larger than the current size of the array, then additional
+uninitialized values will be added to the end of the sequence of
+values. 
+.B "stdcarr_clear"
+deletes all of the values contained in the sequence.
+.B "stdcarr_set_capacity"
+sets the high capacity of the array to be 
+.IR "num_elems" , 
+which will usually require a reallocation. This function is often
+used when the user has turned off the auto-allocation mechanism and
+wants to set the size of memory allocated to the array manually.
+.B "stdcarr_reserve"
+reserves enough memory space to contain
+.I "num_elems"
+values; if the auto-allocation mechanism is disabled this function
+has the same effect as
+.BR "stdcarr_set_capacity" .
+.B "stdcarr_shrink_fit"
+makes the capacity of the array the same as the size of the array so
+that there is no unused allocated memory. This operation will usually
+require a re-allocation.
+
+stdcarr, like the other stdutil data structures, has several methods
+for getting iterators that reference particular values in its
+sequence. stdcarr provides random-access iterators (see std_it).
+.B "stdcarr_begin"
+sets the iterator 
+.I "it"
+to reference the first or 0th value of the array, or, if the array is
+empty to reference the end of the array.
+.B "stdcarr_end"
+sets the iterator to reference the end of the array. The end of the
+array is one past the last value contained in the array and has an
+rank of n.
+.B "stdcarr_last"
+sets the iterator to reference the nth value in the sequence (rank of
+n-1). It is illegal to call stdcarr_last on an empty array.
+.B "stdcarr_get"
+sets the iterator to reference the value with rank
+.I "elem_num" 
+or end if 
+.I "elem_num"
+is n.
+.I "elem_num"
+must be less than or equal to n. All of these functions return
+pointers to the passed iterator to allow function composition. All of
+these functions work in constant O(1) time.
+
+.B "stdcarr_max_size"
+returns the absolute maximum number of values of a particular size an
+array can hold. As an array's size approaches this number (within a
+small multiplicative factor) the auto-allocation mechanism may begin
+to fail because it tries to allocate too much memory. If an array
+needs to be able to hold somewhere around this many values, then the
+user should disable the auto-allocation mechanism and manually control
+the capacity of the array.
+
+.B "stdcarr_val_size"
+returns the size, in bytes, of the value type this array is currently
+containing.
+
+.SH "RETURN VALUES"
+
+Most of the functions' return values are described in the SYNOPSIS and
+cannot fail. However, the constructors and functions that potentially
+affect the capacity of the array can fail. If such a function returns
+an int, then it returns zero on success and non-zero on failure. If
+such a function returns a stdcarr_it *, then it returns non-zero on
+success and null(0) on failure. Whenever any stdcarr function fails it
+has no side effects.
+
+.SH "ERRORS"
+
+The constructor functions can return the following error codes:
+.RS
+.TP
+.B "STD_ILLEGAL_PARAM" 
+the sizeof the value type was zero.
+
+.TP
+.B "STD_MEM_FAILURE"
+a memory allocation failure occurred.
+.RE
+
+Functions that potentially affect the capacity of the array and return
+an int, return the following error codes on error:
+.RS
+.TP
+.B "STD_MEM_FAILURE"
+a memory allocation failure occurred.
+.RE
+
+.SH "NOTES"
+
+For performance reasons, by default the stdutil library does no usage
+checking. It assumes the programmer knows what s/he is doing and
+doesn't want additional overhead incurred from sanity checks.
+
+However, the library can be built will several types of checks,
+including bounds and initialization checks that can catch many common
+programming mistakes. See the README file included with the stdutil
+library distribution to see how to create such a "checked" or debug
+library.
+
+.SH "AUTHOR"
+
+John Schultz <jschultz@cnds.jhu.edu>
+
+.SH "SEE ALSO"
+
+std_it, stdarr, stddll

@@ -1,0 +1,43 @@
+Threshold Signature Library
+---------------------------
+
+Sarvjeet Singh <sarvjeet_s@yahoo.com, sarvjeet@purdue.edu>
+Abhilasha Bhargav <bhargav@cs.purdue.edu>
+Rahim Sewani <rahim@cs.purdue.edu>
+
+This library is an implementation of protocol 2 of the Shoup's
+paper - Practical Threshold Signatures (See references).
+
+This library uses the OpenSSL (see references) crypto library. 
+So, you need have that installed on your system before you can 
+install this library.
+
+See INSTALL for general instructions on how to install this
+library. This library installs the header file (TC.h) in the 
+<prefix>/include directory. The libraries (static and if
+possible shared) is installed in <prefix>/lib.  See TC.h for 
+API for this library.
+
+Normally, you need to run following commands to install this library:
+
+$ cd <path-to-package-diry>
+$ ./configure
+$ make
+# make install
+
+You need to run the last command as root if you are installing
+the package in the default prefix (/usr/local)
+
+To compile programs that use this library, pass -lTC flag
+to the cc compiler to link the libTC library.
+
+You can uninstall the library using the command (after ./configure)
+
+# make uninstall
+
+
+References:
+Shoup's Paper:
+http://citeseer.ist.psu.edu/shoup99practical.html
+OpenSSL:
+http://www.openssl.org/
