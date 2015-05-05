@@ -123,6 +123,7 @@ void Usage(int argc, char **argv) {
 	exit(0);
       }
       My_Server_ID = My_Client_ID;
+      printf("Client ID: %d - Server ID: %d\n", My_Client_ID, My_Server_ID);
       argc--; argv++;
     }
     /* [-s server_id] (if different from My_ClientID) */

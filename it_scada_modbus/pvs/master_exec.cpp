@@ -5,7 +5,7 @@
  *
  * Creator: Marco
  * Created: 3/27/2015
- * Last modified: 4/27/2015
+ * Last modified: 5/5/2015
  */
 
 #include <stdio.h>
@@ -77,7 +77,7 @@ int Read_Message(int s) {
     close(s);
     return ret;
   }
-  Validate_Message((signed_message *)buf);
+  Validate_Message(mess);
 
   return ret;
 }
@@ -86,7 +86,7 @@ int Write_Message(int s, signed_message *mess, int nBytes) {
   int ret;
 
   ret = TCP_Write(s, mess, nBytes);
-  if(ret <= 0) {
+  if (ret <= 0) {
     perror("Writing error");
     close(s);
   }
@@ -125,20 +125,22 @@ void Process_SCADA_Message(signed_message *mess) {
   scada_mess = (signed_message *)(res + 1);
   mod = (modbus_tcp_mess *)(scada_mess + 1);
 
-  // Discard the message if already processed
-  if(executed[mod->seq_num] != 0)
-    return;
-  executed[mod->seq_num] = 1;
-
   // If the message is a feedback, send it to the RTU
   // otherwise process it locally
   if(mod->type == FEEDBACK) {
     d->tx_switch = mod->value;
-    nBytes = mess->len + sizeof(signed_message);
+    nBytes = scada_mess->len + sizeof(signed_message);
+    scada_mess->machine_id = My_Client_ID;
     if(Write_Message(dad_sock, scada_mess, nBytes) > 0)
       printf("Write to RTU: var=%d, slave_id=%d, start_add=%d, value=%d\n", mod->var, mod->slave_id, mod->start_add, mod->value);
     return;
   }
+
+  // Discard the message if already processed
+  // Currently, we discard only messages from the DAD
+  if(executed[mod->seq_num] != 0)
+    return;
+  executed[mod->seq_num] = 1;
 
   // There are two kinds of messages received from RTU
   // 1) COIL_STATUS: specifies if a switch is open/closed
@@ -174,7 +176,7 @@ void Process_SCADA_Message(signed_message *mess) {
   str = Var_Type_To_String(mod->var);
   sprintf(name, "%s(%d,%d)", str, mod->slave_id, mod->start_add);
   free(str);
-  printf("mess %d: %s = %d\n", res->seq_num, name, mod->value);
+  printf("mess %d: %s = %d\n", mod->seq_num, name, mod->value);
 }
 
 void Send_Feedback(unsigned int var, unsigned int slave_id, unsigned int start_add, int value) {

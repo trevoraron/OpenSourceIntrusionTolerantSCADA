@@ -72,6 +72,7 @@ char* Var_Type_To_String(int var) {
       sprintf(str, "coilStatus");
       break;
     default:
+      sprintf(str, "Invalid message");
       break;
   }
 

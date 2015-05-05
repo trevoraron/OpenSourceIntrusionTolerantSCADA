@@ -66,12 +66,36 @@ rlModbus                  *modbus                   = NULL;
 rlSocket                  *mysocket                 = NULL;
 rlSerial                  *tty                      = NULL;
 
+// local functions
+static int Write_To_PVS(unsigned int, unsigned int, unsigned int, int);
+static void *socketWriteThread(void *);
+static void *socketReadThread(void *);
+void Verify_Slot(unsigned int);
+void Execute_Feedback(modbus_tcp_mess *);
+static int init(int, char **);
+static int modbusCycle(int, int, int, int, unsigned char *);
+static int readModbus(int);
+
 // values for pvs sockets
 #define PORT 5555
-#define PVS_ADDRESS "127.0.0.1"
+#define NUM_OF_PVS 4
+#define F 1
 #define MY_ID 1
-int sock;
+int sock[NUM_OF_PVS + 1];
+const char *pvs_list[NUM_OF_PVS + 1];
 unsigned int seq_num = 0;
+unsigned int curr_serv = 0;
+
+// data structures and variables to store 
+// feedbacks from different replicas of the PVS
+typedef struct dummy_feedback {
+  unsigned int seq_num;
+  unsigned int num_of_mess;
+  unsigned int executed;
+  modbus_tcp_mess *control_mess[NUM_OF_PVS + 1];
+} feedback;
+
+feedback slot[10001];
 
 // values for synchronizing reads 
 // and writes from/to shared variables
@@ -94,17 +118,23 @@ struct rtu_status *rtu_s;
 static int modbus_idletime = (4*1000)/96;
 
 static int Write_To_PVS(unsigned int var, unsigned int s_id, unsigned int add, int v) {
-  int ret, nBytes;
+  int i, ret, nBytes;
   signed_message *mess;
 
   mess = PKT_Construct_Modbus_TCP_Mess(READ_DATA, ++seq_num, var, s_id, add, v);
   mess->machine_id = MY_ID;
   nBytes = mess->len + sizeof(signed_message);
 
-  ret = TCP_Write(sock, mess, nBytes);
-  if(ret <= 0) {
-    perror("Writing error");
-    close(sock);
+  for(i = 1; i <= F + 1; i++) {
+    // rotate across servers
+    curr_serv++;
+    if(curr_serv > NUM_OF_PVS)
+      curr_serv = 1;
+    ret = TCP_Write(sock[curr_serv], mess, nBytes);
+    if(ret <= 0) {
+      perror("Writing error");
+      close(sock[curr_serv]);
+    }
   }
 
   free(mess);
@@ -144,78 +174,141 @@ static void *socketReadThread(void *arg) {
   if(arg != NULL)
     return NULL;
 
-  char buf[1024], data[4], temp[1024];
-  int ret, val, slave, function, adr, buflen, doit, remaining_bytes;
-  fd_set active_fd_set;
+  char temp[1024];
+  int i, ret, remaining_bytes;
+  fd_set read_fd_set, active_fd_set;
   signed_message *mess;
   modbus_tcp_mess *mod;
 
   FD_ZERO(&active_fd_set);
-  FD_SET(sock, &active_fd_set);
+  for(i = 1; i <= NUM_OF_PVS; i++)
+    FD_SET(sock[i], &active_fd_set);
 
   while(1) {
-    if(select(FD_SETSIZE, &active_fd_set, NULL, NULL, NULL) > 0) {
-      if(FD_ISSET(sock, &active_fd_set)) {
-        ret = TCP_Read(sock, temp, sizeof(signed_message));
-        if(ret < 0) {
-          perror("Reading error");
-          close(sock);
-          break;
-        }
+    read_fd_set = active_fd_set;
+    if(select(FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) > 0) {
+      for(i = 1; i <= NUM_OF_PVS; i++) {
+        if(FD_ISSET(sock[i], &active_fd_set)) {
+          ret = TCP_Read(sock[i], temp, sizeof(signed_message));
+          if(ret < 0) {
+            perror("Reading error");
+            close(sock[i]);
+            break;
+          }
 
-        mess = ((signed_message *)temp);
-        remaining_bytes = (int)mess->len;
-        ret = TCP_Read(sock, &temp[sizeof(signed_message)], remaining_bytes);
-        if(ret < 0) {
-          perror("Reading error");
-          close(sock);
-          break;
-        }
+          mess = ((signed_message *)temp);
+          remaining_bytes = mess->len;
+          ret = TCP_Read(sock[i], &temp[sizeof(signed_message)], remaining_bytes);
+          if(ret < 0) {
+            perror("Reading error");
+            close(sock[i]);
+            break;
+          }
 
-        mess = ((signed_message *)temp);
-        mod = (modbus_tcp_mess *)(mess + 1);
-        slave = (int)mod->slave_id;
-        adr = (int)mod->start_add;
-        val = mod->value;
-        doit = 0;
-
-        if(mod->var == COIL_STATUS) {
-          function     = rlModbus::ForceSingleCoil;
-          data[0] = adr/256; data[1] = adr & 0x0ff;
-          data[2] = 0; data[3] = 0;
-          if(val != 0) data[2] = 0x0ff;
-          buflen = 4;
-          doit = 1;
-        }  
-        else if(mod->var == HOLDING_REGISTERS) {
-          function     = rlModbus::PresetSingleRegister;
-          data[0] = adr/256; data[1] = adr & 0x0ff;
-          data[2] = val/256; data[3] = val & 0x0ff;
-          buflen = 4;
-          doit = 1;
+          mod = (modbus_tcp_mess *)(mess + 1);
+          // check if we have 2F+1 equal replies
+          if(slot[mod->seq_num].executed != 1) {
+            // TODO: verify signature here!
+            slot[mod->seq_num].seq_num = mod->seq_num;
+            if(slot[mod->seq_num].control_mess[mess->machine_id] == NULL) {
+              slot[mod->seq_num].control_mess[mess->machine_id] = mod;
+              slot[mod->seq_num].num_of_mess++;
+              if(slot[mod->seq_num].num_of_mess >= F + 1)
+                Verify_Slot(mod->seq_num);
+            }
+          }
         }
-        else {
-        printf("USER_ERROR: unknown %s entered\n", buf);
-        printf("Possible values:\n");
-        printf("coil(slave,adr)\n");
-        printf("register(slave,adr)\n");
-        }
-
-        if(doit) {
-          thread->lock();
-          if(use_socket != 1) rlsleep(modbus_idletime); // on tty we have to sleep
-          if(debug) printf("modbus_write: slave=%d function=%d data[0]=%d\n", slave, function, data[0]);
-          ret = modbus->write( slave, function, (const unsigned char *) data, buflen);
-          ret = modbus->response( &slave, &function, (unsigned char *) buf);
-          if(use_socket != 1) rlsleep(modbus_idletime); // on tty we have to sleep
-          thread->unlock();
-          if(ret < 0) perror("Write to RTU: error");
-          rlsleep(10); // sleep in order that reading can work in parallel even if we are sending a lot of data
-        }  
       }
     }
   }
   pthread_exit(NULL);  
+}
+
+void Verify_Slot(unsigned int sn) {
+  int i, j, count, doit;
+  modbus_tcp_mess *mod = NULL, *next = NULL;
+
+  doit = 0;
+  for(i = 1; i <= NUM_OF_PVS + 1; i++) {
+    count = 1;
+    if(slot[sn].control_mess[i] != NULL)
+      mod = slot[sn].control_mess[i];
+    if(mod != NULL) {
+      for(j = 1; j <= NUM_OF_PVS + 1; j++) {
+        if(i != j) {
+          if(slot[sn].control_mess[j] != NULL)
+            next = slot[sn].control_mess[j];
+          if(next != NULL) {
+            if(mod->slave_id == next->slave_id && mod->start_add == next->start_add && mod->value == next->value)
+              count++;
+          }
+        }
+      }
+    }
+    if(count >= F + 1) {
+      doit = 1;
+      break;
+    }
+  }
+
+  // execute the feedback if we received at least f+1 matching messages
+  // check if the previous one has been executed and if there are other
+  // possible feedbacks to execute
+  if(doit) {
+    if(sn == 1 || slot[sn - 1].executed == 1) {
+      Execute_Feedback(mod);
+      slot[sn].executed = 1;
+      for(i = 1; i < NUM_OF_PVS + 1; i++)
+        slot[sn].control_mess[i] = NULL;
+      if(sn < 10000 && slot[sn + 1].num_of_mess >= 2 * F + 1)
+        Verify_Slot(sn + 1);
+    }
+  }
+}
+
+void Execute_Feedback(modbus_tcp_mess *mod) {
+
+  char buf[1024], data[4];
+  int val, slave, function, adr, buflen, ret, doit;
+
+  slave = (int)mod->slave_id;
+  adr = (int)mod->start_add;
+  val = mod->value;
+  doit = 0;
+
+  if(mod->var == COIL_STATUS) {
+    function     = rlModbus::ForceSingleCoil;
+    data[0] = adr/256; data[1] = adr & 0x0ff;
+    data[2] = 0; data[3] = 0;
+    if(val != 0) data[2] = 0x0ff;
+    buflen = 4;
+    doit = 1;
+  }  
+  else if(mod->var == HOLDING_REGISTERS) {
+    function     = rlModbus::PresetSingleRegister;
+    data[0] = adr/256; data[1] = adr & 0x0ff;
+    data[2] = val/256; data[3] = val & 0x0ff;
+    buflen = 4;
+    doit = 1;
+  }
+  else {
+    printf("USER_ERROR: unknown %s entered\n", buf);
+    printf("Possible values:\n");
+    printf("coil(slave,adr)\n");
+    printf("register(slave,adr)\n");
+  }
+
+  if(doit) {
+    thread->lock();
+    if(use_socket != 1) rlsleep(modbus_idletime); // on tty we have to sleep
+    if(debug) printf("modbus_write: slave=%d function=%d data[0]=%d\n", slave, function, data[0]);
+    ret = modbus->write(slave, function, (const unsigned char *) data, buflen);
+    ret = modbus->response(&slave, &function, (unsigned char *) buf);
+    if(use_socket != 1) rlsleep(modbus_idletime); // on tty we have to sleep
+    thread->unlock();
+    if(ret < 0) perror("Write to RTU: error");
+    rlsleep(10); // sleep in order that reading can work in parallel even if we are sending a lot of data
+  }
 }
 
 static int init(int ac, char **av)
@@ -475,8 +568,14 @@ int main(int argc,char *argv[])
   }
 
   // connect to the pvs
-  sock = activeTCPsock(PVS_ADDRESS, PORT + 1);
+  pvs_list[1] = "128.220.221.35";
+  pvs_list[2] = "128.220.221.34";
+  pvs_list[3] = "128.220.221.33";
+  pvs_list[4] = "128.220.221.32";
+  for(i = 1; i <= NUM_OF_PVS; i++)
+    sock[i] = activeTCPsock(pvs_list[i], PORT + i);
 
+  memset(slot, 0, 10001 * sizeof(feedback));
   pthread_t tid[2];
   pthread_mutex_init(&rtu_v_mutex, NULL);
   rtu_s = (rtu_status *)malloc(sizeof(rtu_status));
