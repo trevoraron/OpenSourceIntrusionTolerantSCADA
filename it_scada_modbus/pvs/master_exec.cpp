@@ -128,7 +128,6 @@ void Process_SCADA_Message(signed_message *mess) {
   // If the message is a feedback, send it to the RTU
   // otherwise process it locally
   if(mod->type == FEEDBACK) {
-    d->tx_switch = mod->value;
     nBytes = scada_mess->len + sizeof(signed_message);
     scada_mess->machine_id = My_Client_ID;
     if(Write_Message(dad_sock, scada_mess, nBytes) > 0)

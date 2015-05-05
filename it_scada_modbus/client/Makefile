@@ -286,7 +286,9 @@ modbus_client.o: modbus_client.cpp /opt/pvb/rllib/lib/rlmodbus.h \
 		/opt/pvb/rllib/lib/rlthread.h \
 		/opt/pvb/rllib/lib/rlwthread.h \
 		/opt/pvb/rllib/lib/rlinifile.h \
-		/opt/pvb/rllib/lib/rlspreadsheet.h
+		/opt/pvb/rllib/lib/rlspreadsheet.h \
+		../helpers/scada_packets.h \
+		../helpers/TCP_Wrapper.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o modbus_client.o modbus_client.cpp
 
 ../helpers/scada_packets.o: ../helpers/scada_packets.c ../helpers/scada_packets.h

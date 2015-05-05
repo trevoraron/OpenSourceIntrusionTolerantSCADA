@@ -161,6 +161,8 @@ static void *socketWriteThread(void *arg) {
       if(Write_To_PVS(rtu_s->sample_list[i].var, rtu_s->sample_list[i].slave_id, rtu_s->sample_list[i].start_add, rtu_s->sample_list[i].val) < 0)
         perror("Impossible to write data to the PVS");
     }
+    last_ts.tv_sec = rtu_s->ts.tv_sec;
+    last_ts.tv_usec = rtu_s->ts.tv_usec;
     skip:
     pthread_mutex_unlock(&rtu_v_mutex);
     // critical section ends here
@@ -206,7 +208,7 @@ static void *socketReadThread(void *arg) {
           }
 
           mod = (modbus_tcp_mess *)(mess + 1);
-          // check if we have 2F+1 equal replies
+          // check if we have F+1 equal replies
           if(slot[mod->seq_num].executed != 1) {
             // TODO: verify signature here!
             slot[mod->seq_num].seq_num = mod->seq_num;
@@ -260,7 +262,7 @@ void Verify_Slot(unsigned int sn) {
       slot[sn].executed = 1;
       for(i = 1; i < NUM_OF_PVS + 1; i++)
         slot[sn].control_mess[i] = NULL;
-      if(sn < 10000 && slot[sn + 1].num_of_mess >= 2 * F + 1)
+      if(sn < 10000 && slot[sn + 1].num_of_mess >= F + 1)
         Verify_Slot(sn + 1);
     }
   }

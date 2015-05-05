@@ -9,6 +9,7 @@
  */
 
 /* Definitions for compatibility with Prime */
+#define DUMMY 0
 #define UPDATE 9
 #define CLIENT_RESPONSE 10
 #define UPDATE_SIZE 200

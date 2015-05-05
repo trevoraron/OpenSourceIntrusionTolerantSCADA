@@ -77,6 +77,7 @@ typedef struct dummy_signed_update_message {
 typedef struct dummy_client_response_message {
   unsigned int machine_id;
   unsigned int seq_num;
+  /* the update content follows */
 } client_response_message;
 
 /* Modbus TCP message */
