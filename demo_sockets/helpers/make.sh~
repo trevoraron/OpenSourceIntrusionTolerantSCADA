@@ -1,7 +1,0 @@
-#!/bin/bash
-
-rm *.o *.o~ *.h~ *.c~
-
-gcc -c scada_packets.c -o scada_packets.o
-gcc -c message_queue.c -o message_queue.o
-gcc -c TCP_Wrapper.c -o TCP_Wrapper.o
