@@ -5,6 +5,7 @@ Contributors:
     -Trevor Aron
     -Akshay Srivatsan
     -JR Charles
+    -Marco Platania
 
     -JHU DSN lab
 
@@ -23,4 +24,20 @@ http://www.cnds.jhu.edu/pub/papers/Survivable_SCADA.pdf
 This project is being completed as part of the Advanced Distributed 
 Systems course at the Johns Hopkins University, under the supervision of 
 Prof. Yair Amir and the Johns Hopkins Distribued Systems & Networks Lab.
+
+The work has completed. See the powerpoint at
+http://www.dsn.jhu.edu/courses/cs667-2015/SCADA/
+for details of our project.
+
+Folders:
+it_scada_modbus is the folder where the final code for the demo is. This
+is the demo that is of a real SCADA system and uses replication.
+
+modbus_sockets is a demo of pvbrowser without the shared memory
+
+modbus_tcp_sim is an RTU simulator we built to generate dummy values.
+it has been deprecated, and replaced with a physical RTU emulator
+
+scada_modbus is a demo of pvbrowser without the shared memory of a real
+SCADA system without replication
 
